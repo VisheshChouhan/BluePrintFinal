@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "533764852792",
+    "project_id": "blueprint-de447",
+    "storage_bucket": "blueprint-de447.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:533764852792:android:667be50c5f1a38dc52eacd",
+        "android_client_info": {
+          "package_name": "com.example.blue_print"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCsCC6UmOt7gbxESmR_mN7QS_pDVrh2HY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
