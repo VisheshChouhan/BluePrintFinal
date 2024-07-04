@@ -90,9 +90,30 @@ class _RegisterPageState extends State<RegisterPage> {
 
         debugPrint("Registration After");
         print("Registration After");
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => SplashScreen()),
-        );
+
+
+        //try sign in
+        try{
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: emailController.text.toString().trim(),
+            password: passwordController.text.toString().trim(),
+          );
+          //pop the loading circle
+          //Navigator.pop(context);
+
+          // navigating to dashboard
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => SplashScreen()),
+          );
+
+        }on FirebaseAuthException catch(e){
+          //Show error message
+          showErrorMessage(e.code);
+        }
+
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(builder: (context) => SplashScreen()),
+        // );
 
       } else {
         //show error message that the password does not match

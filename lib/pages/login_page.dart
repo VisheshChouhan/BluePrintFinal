@@ -1,4 +1,5 @@
 import 'package:blue_print/pages/home_page.dart';
+import 'package:blue_print/pages/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // import 'package:teachers_app/models/MyButton.dart';
@@ -46,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
 
       // navigating to dashboard
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => SplashScreen()),
       );
 
     }on FirebaseAuthException catch(e){

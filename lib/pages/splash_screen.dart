@@ -1,3 +1,4 @@
+import 'package:blue_print/pages/coordinator_pages/coordinator_home_page.dart';
 import 'package:blue_print/pages/helper_pages/connect_page.dart';
 import 'package:blue_print/pages/home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:blue_print/pages/loginOrRegisterPage.dart';
 import 'package:blue_print/pages/login_page.dart';
 
+import '../features/roles/admin/presentation/pages/admin_home_page.dart';
 import 'admin_pages/admin_home_page.dart';
 // import 'package:teachers_app/pages/teacher_dashboard.dart';
 
@@ -53,6 +55,9 @@ class _SplashScreenState extends State<SplashScreen> {
             }
             else if("coordinator" == data["role"].toString())
             {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) =>  CoordinatorHomePage()),
+              );
 
             }
             else if("teacher" == data["role"].toString())
