@@ -1,6 +1,9 @@
+
 import 'package:blue_print/pages/coordinator_pages/coordinator_home_page.dart';
 import 'package:blue_print/pages/helper_pages/connect_page.dart';
 import 'package:blue_print/pages/home_page.dart';
+import 'package:blue_print/pages/student_pages/student_home_page.dart';
+import 'package:blue_print/pages/teacher_pages/teacher_home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +34,6 @@ class _SplashScreenState extends State<SplashScreen> {
           MaterialPageRoute(builder: (context) => LoginOrRegisterPage()),
         );
       } else {
-
         String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
 
         FirebaseFirestore db = FirebaseFirestore.instance;
@@ -39,38 +41,35 @@ class _SplashScreenState extends State<SplashScreen> {
         final docRef = db.collection("users").doc(currentUserId);
 
         await docRef.get().then(
-              (DocumentSnapshot doc) async {
+          (DocumentSnapshot doc) async {
             final data = doc.data() as Map<String, dynamic>;
             print("Data");
             print(data);
 
             // Registering Each one in their respective Collection in database
 
-            if("admin" == data["role"].toString())
-            {
+            if ("admin" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) =>  ConnectPage()),
+                MaterialPageRoute(builder: (context) => ConnectPage()),
               );
-
-            }
-            else if("coordinator" == data["role"].toString())
-            {
+            } else if ("coordinator" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) =>  CoordinatorHomePage()),
+                MaterialPageRoute(builder: (context) => CoordinatorHomePage()),
               );
-
+            } else if ("teacher" == data["role"].toString()) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                    builder: (context) => TeacherHomePage(
+                        teacherUID: data["uniqueId"],
+                        teacherName: data["name"])),
+              );
+            } else {
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => StudentHomePage(
+                      studentUID: data["studentCode"],
+                      studentName: data["studentName"]
+                  )));
             }
-            else if("teacher" == data["role"].toString())
-            {
-
-            }
-            else
-            {
-
-            }
-
-
-
           },
           onError: (e) => print("Error getting document: $e"),
         );
@@ -81,15 +80,14 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       backgroundColor: Colors.white,
-      
       body: SafeArea(
         child: Column(
-          children:  [
-
+          children: [
             // Container(
             //
             //   height: 500,
@@ -98,22 +96,19 @@ class _SplashScreenState extends State<SplashScreen> {
             //       fit: BoxFit.cover,
             //     )),
             SizedBox(height: 20),
-            Text("Acadnect",
-            style: TextStyle(
-              fontSize: 40.0,
-              fontWeight: FontWeight.bold,
-            ),),
+            Text(
+              "Acadnect",
+              style: TextStyle(
+                fontSize: 40.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             SizedBox(height: 10),
-            
+
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 40.0),
               child: Text("Streamline Your Classroom ",
-                style: TextStyle(
-                  fontSize: 15.0
-
-                )
-
-                ),
+                  style: TextStyle(fontSize: 15.0)),
             ),
             Text("The App that Helps You Stay Ahead of Your Tasks"),
 
@@ -126,7 +121,6 @@ class _SplashScreenState extends State<SplashScreen> {
           ],
         ),
       ),
-
     );
   }
 }

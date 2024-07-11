@@ -71,15 +71,24 @@ class DatabaseServices{
              }
              else
              {
-               return await db.collection('users').doc(uid).set({
-                 'name': name,
+               await db.collection('students').doc(uniqueId).set({
+                 'studentName': name,
                  'email': email,
                  'department': department,
                  'phone': phone,
-                 'uniqueId': uniqueId,
+                 'studentCode': uniqueId,
                  'role': 'student'
 
-               });
+               }, SetOptions(merge: true));
+               return await db.collection('users').doc(uid).set({
+                 'studentName': name,
+                 'email': email,
+                 'department': department,
+                 'phone': phone,
+                 'studentCode': uniqueId,
+                 'role': 'student'
+
+               } );
              }
 
 
