@@ -15,13 +15,22 @@ class _CoordinatorHomePageState extends State<CoordinatorHomePage> {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: 40,),
+          SizedBox(
+            height: 40,
+          ),
           Text("Coordinator Name here"),
-          SizedBox(height: 40,),
-          ElevatedButton(onPressed: (){
-            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ClassCollectionPage()));
-          }, child: Text("All Classes"))
-
+          SizedBox(
+            height: 40,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ClassCollectionPage()));
+              },
+              child: Text("All Classes")
+          ),
+          ElevatedButton(onPressed: null, child: Text("View Attendance")),
+          ElevatedButton(onPressed: null, child: Text("Delete Student"))
         ],
       ),
     );

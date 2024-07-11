@@ -171,11 +171,11 @@ class _ConnectPageState extends State<ConnectPage> {
     // List<String> usernames = _processReceivedData(_completeData);
     // print("print2 " + usernames.toString());
     
-    if(currentData.startsWith("ep: ")){
-      // setState(() {
-      //   espOutput = currentData.toString();
-      // });
-    }
+    // if(currentData.startsWith("ep: ")){
+    //   setState(() {
+    //     espOutput = currentData.toString();
+    //   });
+    // }
     if(currentData.startsWith("tp: ")){
 
       print("template: " + currentData.toString());
@@ -199,9 +199,12 @@ class _ConnectPageState extends State<ConnectPage> {
            db.collection('students').doc(userSerialController.text.toUpperCase().replaceAll(' ', '')).set({
             'template': templateData,
           });
+           espOutputController.text = "";
         }
         else{
+          int tempLen = templateData.length;
           print("The template is incomplete");
+          print(tempLen);
         }
 
         templateData = '';
@@ -210,6 +213,8 @@ class _ConnectPageState extends State<ConnectPage> {
 
 
       }
+
+      // To print template data on front end for debugging
       if (data.startsWith("tp:")){
         String tempTemplateData = data.substring(4,6);
         templateData = "$templateData$tempTemplateData";
@@ -217,25 +222,28 @@ class _ConnectPageState extends State<ConnectPage> {
         print("template DATa $templateData");
         print("template length " + templateData.length.toString());
         print("data substring"+tempTemplateData+"|");
-        setState(() {
-          espOutput = templateData;
-        });
+        // setState(() {
+        //   espOutput = templateData;
+        // });
 
       }
+
+
       if(templateNumber==512){
         print("Template is "+ templateData);
-      }
-      // else{
+      }// else{
       //   print("Error fetcing template");
       // }
 
+
+      if(data.startsWith("ep: ")){
+        setState(() {
+          espOutput = data.toString();
+        });
+      }
+
+
     }
-
-
-
-
-
-    
 
 
     // Check if the transmission is complete (indicated by '%')

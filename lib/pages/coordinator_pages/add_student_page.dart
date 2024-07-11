@@ -40,7 +40,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
             .collection("students")
             .doc(StudentUID)
             .set({
-          "studentCode": _studentCodeController.text.toUpperCase().trim().toString(),
+          "studentCode": StudentUID,
           "studentName": data["studentName"],
 
         });
@@ -361,7 +361,6 @@ class _AddStudentPageState extends State<AddStudentPage> {
                             setState(() {
                               _UnableToAddStudentList = tempUnableToEnrollList;
                             });
-
                           }
                     }
                   } else{
@@ -378,7 +377,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                   backgroundColor: WidgetStatePropertyAll(Colors.blue),
 
                 ),
-                child:  Text("Upload Marks",
+                child:  Text("Enroll Students",
                   style: GoogleFonts.abel( textStyle: TextStyle(fontSize: 20),color: Colors.white) ,),
               ),
             ),

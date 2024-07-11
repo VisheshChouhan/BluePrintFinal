@@ -79,12 +79,12 @@ class _RegisterPageState extends State<RegisterPage> {
         String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
         print("current use id " + currentUserId);
         DatabaseServices(uid: currentUserId).updateUserDetails(
-            nameController.text,
-            emailController.text,
-            uniqueIdController.text,
-            phonenumberController.text,
-            Department,
-            securitykeyController.text
+            nameController.text.trim(),
+            emailController.text.trim(),
+            uniqueIdController.text.toUpperCase().trim(),
+            phonenumberController.text.trim(),
+            Department.trim(),
+            securitykeyController.text.trim()
 
             );
 
