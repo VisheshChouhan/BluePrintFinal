@@ -1,4 +1,3 @@
-
 import 'package:blue_print/pages/coordinator_pages/coordinator_home_page.dart';
 import 'package:blue_print/pages/helper_pages/connect_page.dart';
 import 'package:blue_print/pages/home_page.dart';
@@ -54,7 +53,10 @@ class _SplashScreenState extends State<SplashScreen> {
               );
             } else if ("coordinator" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => CoordinatorHomePage()),
+                MaterialPageRoute(
+                    builder: (context) => CoordinatorHomePage(
+                        coordinatorUID: data["uniqueId"],
+                        coordinatorName: data["name"])),
               );
             } else if ("teacher" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(
@@ -64,11 +66,10 @@ class _SplashScreenState extends State<SplashScreen> {
                         teacherName: data["name"])),
               );
             } else {
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => StudentHomePage(
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => StudentHomePage(
                       studentUID: data["studentCode"],
-                      studentName: data["studentName"]
-                  )));
+                      studentName: data["studentName"])));
             }
           },
           onError: (e) => print("Error getting document: $e"),

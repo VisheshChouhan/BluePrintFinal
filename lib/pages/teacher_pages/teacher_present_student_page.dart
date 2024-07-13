@@ -153,8 +153,16 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     // Get the current date
     DateTime now = DateTime.now();
     // Format the date
-    String formattedDate = DateFormat('yyyy-MM-dd').format(now) + "-"+
+    String formattedDate = DateFormat('dd-MM-yyyy').format(now) + "-"+
         attendanceCode.text.toString().trim();
+    // Adding number of present Students
+    db
+        .collection("classes")
+        .doc(widget.classCode)
+        .collection("attendance")
+        .doc(formattedDate)
+
+        .set({"date": formattedDate, "totalPresentStudents": finallyPresentStudentMap.length});
 
     print("finallyPresentStudentMap");
     print(finallyPresentStudentMap.toString());

@@ -137,7 +137,7 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
             height: 25.0,
           ),
           SizedBox(
-              height: 700,
+              height: 640,
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:blue_print/pages/coordinator_pages/add_student_page.dart';
+import 'package:blue_print/pages/coordinator_pages/attendance_date_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
@@ -143,100 +144,161 @@ class _ClassPageState extends State<ClassPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              child: Text(
-                widget.className,
-                style: GoogleFonts.abel(
-                  textStyle: const TextStyle(
-                      fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text(
-                widget.classCode,
-                style: GoogleFonts.abel(
-                  textStyle: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(onPressed: () => _showAddTeacherDialogBox(context), child: Text("Add Teacher")),
-            SizedBox(height: 20,),
-            Text("Assigned Teacher:"),
-            SizedBox(
-                height: 100,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection("coordinator")
-                              .doc(currentUserId)
-                              .collection("classes")
-                              .doc(widget.classCode)
-                              .collection("teachers")
-                              .orderBy("teacherCode")
-                              .snapshots(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<
-                                  QuerySnapshot<Map<String, dynamic>>>
-                              snapshot) {
-                            if (snapshot.hasData) {
-                              return ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  itemCount: snapshot.data!.docs.length,
-                                  itemBuilder: (context, index) {
-                                    final Teacher =
-                                    snapshot.data!.docs[index];
-                                    return Text(
-                                      Teacher["teacherCode"],
 
-                                    );
-                                  });
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text('Error:${snapshot.error}'),
+    Color primaryColor = const Color.fromRGBO(1, 94, 127, 1);
+    Color blueColor = const Color.fromRGBO(0, 152, 206, 1.0);
+
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 100,
+          foregroundColor: primaryColor,
+          backgroundColor: primaryColor,
+          shadowColor: primaryColor,
+          leading: IconButton(icon: Icon(Icons.menu, color: Colors.white,),onPressed: null,),
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+              child:Text(
+                widget.className.toUpperCase(),
+                style: GoogleFonts.openSans(
+                    textStyle: TextStyle(color: Colors.white)),
+              ),),
+              Text(
+                widget.classCode,
+                style: GoogleFonts.openSans(
+                  fontSize: 15,
+                    textStyle: TextStyle(color: Colors.white54)),
+              ),
+              Text(
+                "Teachers",
+                style: GoogleFonts.openSans(
+                    fontSize: 12,
+                    textStyle: TextStyle(color: Colors.white70)),
+              ),
+
+
+              SingleChildScrollView(child:
+              SizedBox(
+                  height: 30,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("coordinator")
+                                .doc(currentUserId)
+                                .collection("classes")
+                                .doc(widget.classCode)
+                                .collection("teachers")
+                                .orderBy("teacherCode")
+                                .snapshots(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<
+                                    QuerySnapshot<Map<String, dynamic>>>
+                                snapshot) {
+                              if (snapshot.hasData) {
+                                return ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      final Teacher =
+                                      snapshot.data!.docs[index];
+                                      return Text(
+                                        Teacher["teacherCode"]
+                                        ,
+
+
+                                      );
+                                    });
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text('Error:${snapshot.error}'),
+                                );
+                              }
+                              return const Center(
+                                child: CircularProgressIndicator(),
                               );
-                            }
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
+                            },
+                          ),
                         ),
-                      ),
-                    ]
-                )
-            ),
-            
-            ElevatedButton(onPressed:() {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          AddStudentPage(classCode:  widget.classCode, className: widget.className,)
+                      ]
                   )
-              );
-            }, child: Text("Add students"))
-          ],
-        ),
-      ),
+              ),)
+            ],
+          ),
+        actions:<Widget>[
+          IconButton(onPressed: () => _showAddTeacherDialogBox(context),
+              icon: Icon(Icons.person_add, color: Colors.white,)),
+          IconButton(onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        AddStudentPage(classCode:  widget.classCode, className: widget.className,)
+                )
+            );
+          },
+              icon: Icon(Icons.school, color: Colors.white,))
+        ] ,
+      )
+      ,
+      body: Column(
+        children: [
+
+          SizedBox(
+            height: 700,
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection("classes")
+                            .doc(widget.classCode)
+                            .collection("attendance")
+                            .orderBy("date")
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<
+                                QuerySnapshot<Map<String, dynamic>>>
+                            snapshot) {
+                          if (snapshot.hasData) {
+                            return ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                itemCount: snapshot.data!.docs.length,
+                                itemBuilder: (context, index) {
+                                  final date =
+                                  snapshot.data!.docs[index];
+                                  return AttendanceDateTile(
+                                    date:date["date"],
+                                    presentStudents: date["totalPresentStudents"],
+                                    totalstudents: "6",
+
+
+                                  );
+                                });
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error:${snapshot.error}'),
+                            );
+                          }
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        },
+                      ),
+                    ),
+                  ]
+              )
+          ),
+        ],
+      )
     );
   }
 }
