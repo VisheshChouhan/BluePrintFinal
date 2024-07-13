@@ -251,15 +251,17 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 32),
               AuthTextField(
-                labelText: 'Enter Your Email/Phone',
+                labelText: 'Enter Your Email',
                 borderRadius: 8,
                 prefixIcon: const Icon(Icons.account_circle_rounded),
                 obscureText: false,
                 controller: emailController,
+                hintText: 'Email',
               ),
               const SizedBox(height: 16),
               AuthTextField(
                 labelText: 'Password',
+                hintText: 'Password',
                 borderRadius: 8,
                 prefixIcon: const Icon(Icons.lock),
                 obscureText: _obscureText,
@@ -270,6 +272,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   onPressed: _togglePasswordVisibility,
                 ),
+
               ),
               const SizedBox(height: 8),
               Align(

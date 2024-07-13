@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:blue_print/pages/splash_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'features/roles/admin/presentation/pages/admin_home_page.dart';
 import 'firebase_options.dart';
 
 
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       home:  SplashScreen(),
-      // home: LoginPage(),
+      // home: AdminHomePage(),
     );
   }
 }
