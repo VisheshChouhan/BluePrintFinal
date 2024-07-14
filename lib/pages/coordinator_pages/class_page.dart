@@ -22,10 +22,9 @@ class ClassPage extends StatefulWidget {
 }
 
 class _ClassPageState extends State<ClassPage> {
-
-  TextEditingController _teacherUniqueCodeController = new TextEditingController();
+  TextEditingController _teacherUniqueCodeController =
+      new TextEditingController();
   String? filePath;
-
 
   FirebaseFirestore db = FirebaseFirestore.instance;
   String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
@@ -77,25 +76,20 @@ class _ClassPageState extends State<ClassPage> {
             .doc(teacherCode)
             .collection("classes")
             .doc(widget.classCode)
-            .set({"courseCode": widget.classCode, "courseName": widget.className});
-
-
-
+            .set({
+          "courseCode": widget.classCode,
+          "courseName": widget.className
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Teacher Assigned Succesfully"),
         ));
 
         _teacherUniqueCodeController.clear();
-
-
-
       }
       return null;
     }
   }
-
-
 
   void _showAddTeacherDialogBox(BuildContext context) {
     // Form key for validation
@@ -115,9 +109,9 @@ class _ClassPageState extends State<ClassPage> {
               children: <Widget>[
                 TextFormField(
                   controller: _teacherUniqueCodeController,
-                  decoration: InputDecoration(labelText: 'Enter Teacher Unique Code'),
+                  decoration:
+                      InputDecoration(labelText: 'Enter Teacher Unique Code'),
                 ),
-
               ],
             ),
           ),
@@ -125,7 +119,8 @@ class _ClassPageState extends State<ClassPage> {
             ElevatedButton(
               child: Text('Submit'),
               onPressed: () {
-                if (_formKey.currentState!.validate() && _teacherUniqueCodeController.text.isNotEmpty) {
+                if (_formKey.currentState!.validate() &&
+                    _teacherUniqueCodeController.text.isNotEmpty) {
                   // If the form is valid, proceed to handle the data
                   addNewTeacher();
 
@@ -139,166 +134,167 @@ class _ClassPageState extends State<ClassPage> {
     );
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-
     Color primaryColor = const Color.fromRGBO(1, 94, 127, 1);
     Color blueColor = const Color.fromRGBO(0, 152, 206, 1.0);
 
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 100,
+        appBar: AppBar(
+          toolbarHeight: 100,
           foregroundColor: primaryColor,
           backgroundColor: primaryColor,
           shadowColor: primaryColor,
-          leading: IconButton(icon: Icon(Icons.menu, color: Colors.white,),onPressed: null,),
+          leading: IconButton(
+            icon: Icon(
+              Icons.menu,
+              color: Colors.white,
+            ),
+            onPressed: null,
+          ),
           title: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-              child:Text(
-                widget.className.toUpperCase(),
-                style: GoogleFonts.openSans(
-                    textStyle: TextStyle(color: Colors.white)),
-              ),),
+                child: Text(
+                  widget.className.toUpperCase(),
+                  style: GoogleFonts.openSans(
+                      textStyle: TextStyle(color: Colors.white)),
+                ),
+              ),
               Text(
                 widget.classCode,
                 style: GoogleFonts.openSans(
-                  fontSize: 15,
-                    textStyle: TextStyle(color: Colors.white54)),
+                    fontSize: 15, textStyle: TextStyle(color: Colors.white54)),
               ),
               Text(
                 "Teachers",
                 style: GoogleFonts.openSans(
-                    fontSize: 12,
-                    textStyle: TextStyle(color: Colors.white70)),
+                    fontSize: 12, textStyle: TextStyle(color: Colors.white70)),
               ),
-
-
-              SingleChildScrollView(child:
-              SizedBox(
-                  height: 30,
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection("coordinator")
-                                .doc(currentUserId)
-                                .collection("classes")
-                                .doc(widget.classCode)
-                                .collection("teachers")
-                                .orderBy("teacherCode")
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<
-                                    QuerySnapshot<Map<String, dynamic>>>
-                                snapshot) {
-                              if (snapshot.hasData) {
-                                return ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    itemCount: snapshot.data!.docs.length,
-                                    itemBuilder: (context, index) {
-                                      final Teacher =
-                                      snapshot.data!.docs[index];
-                                      return Text(
-                                        Teacher["teacherCode"]
-                                        ,
-
-
-                                      );
-                                    });
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text('Error:${snapshot.error}'),
+              SingleChildScrollView(
+                child: SizedBox(
+                    height: 30,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection("coordinator")
+                                  .doc(currentUserId)
+                                  .collection("classes")
+                                  .doc(widget.classCode)
+                                  .collection("teachers")
+                                  .orderBy("teacherCode")
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<
+                                          QuerySnapshot<Map<String, dynamic>>>
+                                      snapshot) {
+                                if (snapshot.hasData) {
+                                  return ListView.builder(
+                                      scrollDirection: Axis.vertical,
+                                      itemCount: snapshot.data!.docs.length,
+                                      itemBuilder: (context, index) {
+                                        final Teacher =
+                                            snapshot.data!.docs[index];
+                                        return Text(
+                                          Teacher["teacherCode"],
+                                          style: GoogleFonts.openSans(
+                                              fontSize: 10,
+                                              textStyle: TextStyle(
+                                                  color: Colors.white60)),
+                                        );
+                                      });
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text('Error:${snapshot.error}'),
+                                  );
+                                }
+                                return const Center(
+                                  child: CircularProgressIndicator(),
                                 );
-                              }
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            },
+                              },
+                            ),
                           ),
-                        ),
-                      ]
-                  )
-              ),)
+                        ])),
+              )
             ],
           ),
-        actions:<Widget>[
-          IconButton(onPressed: () => _showAddTeacherDialogBox(context),
-              icon: Icon(Icons.person_add, color: Colors.white,)),
-          IconButton(onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        AddStudentPage(classCode:  widget.classCode, className: widget.className,)
-                )
-            );
-          },
-              icon: Icon(Icons.school, color: Colors.white,))
-        ] ,
-      )
-      ,
-      body: Column(
-        children: [
-
-          SizedBox(
-            height: 700,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("classes")
-                            .doc(widget.classCode)
-                            .collection("attendance")
-                            .orderBy("date")
-                            .snapshots(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<
-                                QuerySnapshot<Map<String, dynamic>>>
-                            snapshot) {
-                          if (snapshot.hasData) {
-                            return ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                itemCount: snapshot.data!.docs.length,
-                                itemBuilder: (context, index) {
-                                  final date =
-                                  snapshot.data!.docs[index];
-                                  return AttendanceDateTile(
-                                    date:date["date"],
-                                    presentStudents: date["totalPresentStudents"],
-                                    totalstudents: "6",
-
-
-                                  );
-                                });
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text('Error:${snapshot.error}'),
+          actions: <Widget>[
+            IconButton(
+                onPressed: () => _showAddTeacherDialogBox(context),
+                icon: Icon(
+                  Icons.person_add,
+                  color: Colors.white,
+                )),
+            IconButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddStudentPage(
+                                classCode: widget.classCode,
+                                className: widget.className,
+                              )));
+                },
+                icon: Icon(
+                  Icons.school,
+                  color: Colors.white,
+                ))
+          ],
+        ),
+        body: Column(
+          children: [
+            SizedBox(
+                height: 700,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("classes")
+                              .doc(widget.classCode)
+                              .collection("attendance")
+                              .orderBy("date")
+                              .snapshots(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                                  snapshot) {
+                            if (snapshot.hasData) {
+                              return ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: snapshot.data!.docs.length,
+                                  itemBuilder: (context, index) {
+                                    final date = snapshot.data!.docs[index];
+                                    return AttendanceDateTile(
+                                      date: date["date"],
+                                      presentStudents:
+                                          date["totalPresentStudents"],
+                                      totalstudents: "6",
+                                      classCode: widget.classCode,
+                                      className: widget.className,
+                                    );
+                                  });
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text('Error:${snapshot.error}'),
+                              );
+                            }
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
-                          }
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                  ]
-              )
-          ),
-        ],
-      )
-    );
+                    ])),
+          ],
+        ));
   }
 }
