@@ -43,7 +43,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
         actions: [
           IconButton(
             onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> const ProfilePage(),),);
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> const ProfilePage(adminName: '', adminEmail: '', adminPhone: '', adminDepartment: '',),),);
             },
             icon: const Icon(
               Icons.account_circle_rounded,

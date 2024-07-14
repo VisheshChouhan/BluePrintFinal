@@ -1,4 +1,6 @@
 import 'package:blue_print/features/auth/presentation/pages/login_page.dart';
+import 'package:blue_print/pages/admin_pages/admin_home_page.dart';
+import 'package:blue_print/pages/helper_pages/connect_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,11 +29,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
+      //Esko mt htanaaaaaaa.......
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff071952),),
+        useMaterial3: true,
+      ),
       title: 'Flutter Demo',
       home:  SplashScreen(),
-      // home: AdminHomePage(),
+      // home: ConnectPage(),
+      // home: const AdminHomePageOld(adminName: '',),
     );
   }
 }
@@ -49,4 +57,5 @@ Future<void> _getPermission() async {
   }
 }
 
+//*******************************************
 

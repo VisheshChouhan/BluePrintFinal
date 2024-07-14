@@ -9,8 +9,8 @@ class BasicInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-        style: ElevatedButton.styleFrom(
+    return TextButton(
+        style: TextButton.styleFrom(
           fixedSize: Size(double.infinity, 40),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0),),
           backgroundColor: Theme.of(context).dialogBackgroundColor,
