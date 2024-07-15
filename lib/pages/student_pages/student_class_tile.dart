@@ -8,7 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 class StudentClassTile extends StatelessWidget {
   final String className;
   final String classCode;
-  final String studentUID;
+  final String studentCode;
+  final String studentName;
 
   //final lectureType;
 
@@ -16,7 +17,7 @@ class StudentClassTile extends StatelessWidget {
     super.key,
     required this.classCode,
     required this.className,
-    required this.studentUID,
+    required this.studentCode, required this.studentName,
 
     //required this.lectureType,
   });
@@ -45,7 +46,9 @@ class StudentClassTile extends StatelessWidget {
                           builder: (context) => StudentAttendancePage(
                               className: className,
                               classCode: classCode,
-                              studentUID: studentUID)));
+                              studentCode: studentCode
+                              ,studentName: studentCode,
+                          )));
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),

@@ -49,9 +49,11 @@ dependencies:
   file_picker: ^6.1.1
   path: ^1.8.3
   csv: ^5.0.1
+  flutter_blue_plus: ^1.0.0
 
 
   flutter_bluetooth_serial: ^0.4.0
+  bluetooth_enable_fork: ^0.1.6
 
 
 dev_dependencies:

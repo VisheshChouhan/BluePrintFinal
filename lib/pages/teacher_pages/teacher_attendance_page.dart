@@ -6,7 +6,9 @@ import 'dart:typed_data';
 import 'package:blue_print/pages/teacher_pages/teacher_present_student_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:bluetooth_enable_fork/bluetooth_enable_fork.dart';
 import 'package:permission_handler/permission_handler.dart';
 // import 'attendance_screen.dart';
 
@@ -24,6 +26,10 @@ class TeacherAttendancePage extends StatefulWidget {
 }
 
 class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
+
+
+
+
   List<BluetoothDevice> _pairedDevices = [];
   BluetoothConnection? _connection;
   bool _isConnected = false;
@@ -51,6 +57,17 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
     espOutputController.text = "esp output";
     // requestPermission();
 
+    // Request to turn on Bluetooth within an app
+    BluetoothEnable.enableBluetooth.then((result) {
+      if (result == "true") {
+        // Bluetooth has been enabled
+
+      }
+      else if (result == "false") {
+        // Bluetooth has not been enabled
+      }
+    });
+
     FlutterBluetoothSerial.instance
         .getBondedDevices()
         .then((List<BluetoothDevice> bondedDevices) {
@@ -58,6 +75,24 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
         _pairedDevices = bondedDevices;
       });
     });
+
+    // _checkBluetooth();
+
+  }
+
+
+
+
+  void refreshBluetoothDevicesList()
+  {
+    FlutterBluetoothSerial.instance
+        .getBondedDevices()
+        .then((List<BluetoothDevice> bondedDevices) {
+      setState(() {
+        _pairedDevices = bondedDevices;
+      });
+    });
+
   }
 
   @override
@@ -279,11 +314,11 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
       ));
     } else {
       print("Inside Setup Class else");
-      String tempStudentCode = "FINGER1";
-      String tempStudentTemplate =
-          "03035C1A1C013501800000000000000000000000000000000000000000000000000000000000000000000000000000000500060079000000C0CCC33030F33CFFFFF3FBFBAABAAAA9AAAAAA66555554555545544401010101010101010101010101010101010101010101010101010101010101010101010101010101010101011A96969E7029A77E63AC265E5534515E6FBA905E30BB52BE623FA6FE6C4366DE52C3D1DE411B665F5F27D01F64B9D05F1EBA147F3BBB683F2F42D2FF35AA529C33A6D3BD30B2697A3134927A389A12383DAED25744AA903444B1D1B428992872271754730AB8403E000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003035A1A0001200181000000000000000000000000000000000000000000000000000000000000000000000000000000030006006D000000C00F0CCC3FCFF33FFFFFEEEAAAAAAAAAA995555555555555040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+      // String tempStudentCode = "FINGER1";
+      // String tempStudentTemplate =
+      //     "03035C1A1C013501800000000000000000000000000000000000000000000000000000000000000000000000000000000500060079000000C0CCC33030F33CFFFFF3FBFBAABAAAA9AAAAAA66555554555545544401010101010101010101010101010101010101010101010101010101010101010101010101010101010101011A96969E7029A77E63AC265E5534515E6FBA905E30BB52BE623FA6FE6C4366DE52C3D1DE411B665F5F27D01F64B9D05F1EBA147F3BBB683F2F42D2FF35AA529C33A6D3BD30B2697A3134927A389A12383DAED25744AA903444B1D1B428992872271754730AB8403E000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003035A1A0001200181000000000000000000000000000000000000000000000000000000000000000000000000000000030006006D000000C00F0CCC3FCFF33FFFFFEEEAAAAAAAAAA995555555555555040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 
-      String command = "t-$templateId-$tempStudentCode-$tempStudentTemplate";
+      // String command = "t-$templateId-$tempStudentCode-$tempStudentTemplate";
       print(_isConnected);
 
       //
@@ -418,17 +453,20 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
     }
   }
 
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Connect Fingerprint Scanner'),
-        ),
+
         body: SingleChildScrollView(
           child: Stack(
             children: [
               Column(
                 children: [
+                  ElevatedButton(onPressed: (){refreshBluetoothDevicesList();}, child: Text("Refresh")),
                   ElevatedButton(
                       onPressed: () {
                         setState(() {

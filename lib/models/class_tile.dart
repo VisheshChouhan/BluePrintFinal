@@ -20,15 +20,15 @@ class ClassTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color primaryColor = const Color.fromRGBO(1, 94, 127, 1);
+    Color blueColor = const Color.fromRGBO(0, 152, 206, 1.0);
     return Padding(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal:10),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            image: const DecorationImage(
-                image: AssetImage("lib/assets/subject_background.jpg"),
-                fit: BoxFit.cover),
+            color: primaryColor
           ),
           child: Column(
             children: [
@@ -44,9 +44,9 @@ class ClassTile extends StatelessWidget {
                               )));
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
                   child: Container(
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(0),
                     decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(10)),
@@ -54,12 +54,17 @@ class ClassTile extends StatelessWidget {
                     child: Expanded(
                       child: Row(
                         children: [
+                          Container(width: 10,
+                          height:60,
+                          color: blueColor,),
+                          SizedBox(width: 20,
+                          height: 10,),
                           //Picture of the subject
                           Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(courseCode,
+                              Text(courseCode.toUpperCase(),
                                   style: GoogleFonts.abel(
                                     textStyle: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -69,14 +74,16 @@ class ClassTile extends StatelessWidget {
                                   )),
 
                               //Subject Name
-                              Text(courseName,
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child:Text(courseName.toUpperCase(),
                                   style: GoogleFonts.abel(
                                     textStyle: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 24,
                                         color: Colors.white
                                     ),
-                                  )),
+                                  )),)
                             ],
                           ),
                         ],
