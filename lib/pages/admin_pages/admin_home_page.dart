@@ -357,7 +357,7 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                 ),
               ),
               if (_mode == Mode.Enroll)
-                !_isConnected ? _enrollStudent() : Container(padding: EdgeInsets.all(16), child: Text("Enroll check")),
+                _isConnected ? _enrollStudent() : Container(padding: EdgeInsets.all(16), child: Text("Enroll check")),
               SizedBox(height: 16,),
               Container(
                 color: _mode == Mode.Delete ? MyColorThemeTheme.whiteColor : MyColorThemeTheme.backgroundColor,
