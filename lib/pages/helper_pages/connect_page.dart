@@ -25,6 +25,7 @@ class _ConnectPageState extends State<ConnectPage> {
   bool _isConnected = false;
   bool _isConnecting = false;
   bool _showConnectingDialog = false;
+  bool _isBluetoothEnabled = false;
   String _completeData = '';
   TextEditingController espOutputController = TextEditingController();
   String espOutput = "ESP Output";
@@ -41,14 +42,29 @@ class _ConnectPageState extends State<ConnectPage> {
   void initState() {
     super.initState();
     espOutputController.text = "esp output";
-    // requestPermission();
+    _checkBluetooth();
 
-    FlutterBluetoothSerial.instance
-        .getBondedDevices()
-        .then((List<BluetoothDevice> bondedDevices) {
-      setState(() {
-        _pairedDevices = bondedDevices;
-      });
+    // FlutterBluetoothSerial.instance
+    //     .getBondedDevices()
+    //     .then((List<BluetoothDevice> bondedDevices) {
+    //   setState(() {
+    //     _pairedDevices = bondedDevices;
+    //   });
+    // });
+  }
+  Future<void> _checkBluetooth() async {
+    bool isEnabled = await FlutterBluetoothSerial.instance.isEnabled ?? false;
+    setState(() {
+      _isBluetoothEnabled = isEnabled;
+    });
+    if(isEnabled){
+      _fetchPairedDevices();
+    }
+  }
+  Future<void> _fetchPairedDevices() async {
+    List<BluetoothDevice> bondedDevices = await FlutterBluetoothSerial.instance.getBondedDevices();
+    setState(() {
+      _pairedDevices = bondedDevices;
     });
   }
 
@@ -340,6 +356,7 @@ class _ConnectPageState extends State<ConnectPage> {
         children: [
           Column(
             children: [
+              if(_isBluetoothEnabled)
               Expanded(
                 child: ListView.builder(
                   itemCount: _pairedDevices.length,
@@ -357,6 +374,20 @@ class _ConnectPageState extends State<ConnectPage> {
                   },
                 ),
               ),
+
+              if (!_isBluetoothEnabled)
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _checkBluetooth,
+                    child: Text("Enable Bluetooth and Refresh"),
+                  ),
+                ),
+              if (_isBluetoothEnabled)
+                ElevatedButton(
+                  onPressed: _fetchPairedDevices,
+                  child: Text("Refresh Device List"),
+                ),
+
               ElevatedButton(
                 onPressed: () {
                   setState(() {

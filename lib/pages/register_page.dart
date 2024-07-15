@@ -3,15 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../assets/my_color_theme.dart';
+import '../features/auth/presentation/widgets/auth_bottom_text.dart';
+import '../features/auth/presentation/widgets/auth_button.dart';
+import '../features/auth/presentation/widgets/auth_text_field.dart';
+import '../features/auth/presentation/widgets/general_text.dart';
 import '../helper_classes/database.dart';
-import '../models/MyButton.dart';
-import '../models/my_textfield.dart';
-import 'home_page.dart';
-// import 'package:teachers_app/models/MyButton.dart';
-// import 'package:teachers_app/models/my_textfield.dart';
-// import 'package:teachers_app/models/squareTile.dart';
-// import 'package:teachers_app/pages/database.dart';
-// import 'package:teachers_app/pages/teacher_dashboard.dart';
+import 'login_page.dart';
+
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -39,6 +38,23 @@ class _RegisterPageState extends State<RegisterPage> {
   final uniqueIdController = TextEditingController();
 
   late String Department = "Department";
+
+  bool _obscureText = true;
+
+  void _togglePasswordVisibility() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
+  }
+  bool showLoginPage = true;
+
+  //toggle between the login page and register page
+
+  void togglePages(){
+    setState(() {
+      showLoginPage = !showLoginPage;
+    });
+  }
 
   ////////////////////////////////////////////////////////
 
@@ -144,228 +160,176 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     //String Department;
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 50.0,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        iconTheme: const IconThemeData(
+          color: MyColorThemeTheme.whiteColor,
+        ),
+        title: const Text("Registration",
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              GeneralText(
+                text: 'Welcome Us',
+                fontSize: 24,
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              GeneralText(
+                text: 'Create new account',
+                fontSize: 16,
+                color: MyColorThemeTheme.secondaryColor,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              AuthTextField(
+                labelText: 'Enter Your Name',
+                borderRadius: 8,
+                prefixIcon: const Icon(Icons.account_circle_outlined),
+                obscureText: false,
+                controller: nameController, hintText: 'Name',
+              ),
+              const SizedBox(height: 16),
+              AuthTextField(
+                labelText: 'Enter Your Email',
+                borderRadius: 8,
+                prefixIcon: const Icon(Icons.email),
+                obscureText: false,
+                controller: emailController, hintText: 'Email',
+              ),
+              const SizedBox(height: 16),
+              AuthTextField(
+                labelText: 'Enter Your Unique ID',
+                borderRadius: 8,
+                prefixIcon: const Icon(Icons.public_off),
+                obscureText: false,
+                controller: uniqueIdController, hintText: 'Unique ID',
+              ),
+              const SizedBox(height: 16),
+              AuthTextField(
+                labelText: 'Enter Your Phone',
+                borderRadius: 8,
+                prefixIcon: const Icon(Icons.phone),
+                obscureText: false,
+                controller: phonenumberController, hintText: 'Phone',
+              ),
+              const SizedBox(height: 16),
+              AuthTextField(
+                labelText: 'Password',
+                borderRadius: 8,
+                prefixIcon: const Icon(Icons.lock),
+                obscureText: _obscureText,
+                controller: passwordController,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: _togglePasswordVisibility,
+                ), hintText: 'Password',
+              ),
+              const SizedBox(height: 16,),
+              AuthTextField(
+                labelText: 'Confirm Password',
+                borderRadius: 8,
+                prefixIcon: const Icon(Icons.lock),
+                obscureText: _obscureText,
+                controller: confirmPasswordController,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: _togglePasswordVisibility,
+                ), hintText: 'Confirm Password',
+              ),
+              const SizedBox(height: 16,),
+              AuthTextField(
+                labelText: 'Enter Your Security key',
+                borderRadius: 8,
+                prefixIcon: const Icon(Icons.key),
+                obscureText: false,
+                controller: securitykeyController, hintText: 'Secret Key',
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black54),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-
-                const Icon(
-                  Icons.lock,
-                  size: 50,
-                ),
-
-                const SizedBox(
-                  height: 25.0,
-                ),
-
-                Text('Welcome to our services',
-                    style: TextStyle(color: Colors.grey[700], fontSize: 16.0)),
-
-                const SizedBox(
-                  height: 25.0,
-                ),
-
-                //Name textfield
-
-                MyTextField(
-                  controller: nameController,
-
-                  obscureText: false,
-                    hintText: "Name"
-
-                ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-                //email textfield
-
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-                MyTextField(
-                  controller: emailController,
-                  hintText: "Email",
-                  obscureText: false,
-                ),
-
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-                MyTextField(
-                  controller: uniqueIdController,
-                  hintText: "Enter Unique Id",
-                  obscureText: false,
-                ),
-
-
-
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-                //Contact Number textfield
-
-                MyTextField(
-                  controller: phonenumberController,
-                  hintText: "Contact Number",
-                  obscureText: false,
-                ),
-
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-
-
-
-
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white),
-                        color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(5),),
-
-                    child: DropdownButton(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
-                      hint: Department == "Department"
-                          ? const Text('Department',
-                        style: TextStyle(fontSize: 17),
-                      )
-                          : Text(
-                              Department,
-                              style: TextStyle(color: Colors.black),
-                            ),
-                      isExpanded: true,
-                      iconSize: 30.0,
+                height: 53,
+                child: Center(
+                  child: DropdownButton(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    hint: Department == "Department"
+                        ? const Text('Department',
+                      style: TextStyle(fontSize: 17,color: Colors.black87),
+                    )
+                        : Text(
+                      Department,
                       style: TextStyle(color: Colors.black),
-                      items: ["Bio Medical Engineering",
-                        "Computer Science and Engineering",
-                        "Civil Engineering",
-                        "Electronics and Telecommunication Engineering",
-                        "Electronics and Instrumentation Engineering",
-                        "Electrical Engineering",
-                        "Information Technology Engineering",
-                        "Industrial and Production Engineering",
-                        "Mechanical Engineering",
-                        "Admin"
+                    ),
+                    isDense: true,
+                    isExpanded: true,
+                    iconSize: 30.0,
+                    style: TextStyle(color: Colors.black),
+                    items: ["Bio Medical Engineering",
+                      "Computer Science and Engineering",
+                      "Civil Engineering",
+                      "Electronics and Telecommunication Engineering",
+                      "Electronics and Instrumentation Engineering",
+                      "Electrical Engineering",
+                      "Information Technology Engineering",
+                      "Industrial and Production Engineering",
+                      "Mechanical Engineering",
+                      "Admin"
 
-                      ].map(
-                        (val) {
-                          return DropdownMenuItem<String>(
-                            value: val,
-                            child: Text(val),
-                          );
-                        },
-                      ).toList(),
-                      onChanged: (val) {
-                        setState(
-                          () {
-                            Department = val!;
-                          },
+                    ].map(
+                          (val) {
+                        return DropdownMenuItem<String>(
+                          value: val,
+                          child: Text(val),
                         );
                       },
-                    ),
+                    ).toList(),
+                    onChanged: (val) {
+                      setState(
+                            () {
+                          Department = val!;
+                        },
+                      );
+                    },
                   ),
                 ),
-
-
-
-
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-                MyTextField(
-                  controller: passwordController,
-                  hintText: "Password",
-                  obscureText: true,
-                ),
-
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-                MyTextField(
-                  controller: confirmPasswordController,
-                  hintText: "Confirm Password",
-                  obscureText: true,
-                ),
-
-                const SizedBox(
-                  height: 10.0,
-                ),
-
-                MyTextField(
-                  controller: securitykeyController,
-                  hintText: "Enter Security Key",
-                  obscureText: true,
-                ),
-
-                const SizedBox(
-                  height: 25.0,
-                ),
-
-                MyButton(
-                  onTap: signUserUp,
-                  text: "Register Now",
-                ),
-
-                const SizedBox(
-                  height: 25.0,
-                ),
-
-
-
-                const SizedBox(
-                  height: 25.0,
-                ),
-
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    //Google Button
-                    // SquareTile(imagePath: 'lib/assets/google.png'),
-
-                    SizedBox(
-                      width: 25.0,
-                    ),
-
-                    //Apple Button
-                    // SquareTile(
-                    //   imagePath: 'lib/assets/apple.png',
-                    // )
-                  ],
-                ),
-                const SizedBox(
-                  height: 25.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Already have an account?'),
-                    GestureDetector(
-                      onTap: widget.onTap,
-                      child: const Text(
-                        'Login Here',
-                        style: TextStyle(
-                          color: Colors.blue,
-                        ),
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              AuthButton(
+                borderRadius: 8,
+                onPressed: signUserUp,
+                vertical: 16,
+                buttonBackgroundColor: Theme.of(context).primaryColor,
+                fontSize: 16,
+                text: 'Registered',
+                textColor: MyColorThemeTheme.whiteColor,
+              ),
+              const SizedBox(height: 16),
+              AuthBottomText(
+                buttonText: 'Sign In',
+                generalText: 'Have an account?',
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage(onTap: togglePages,),),);
+                },
+              ),
+            ],
           ),
         ),
       ),

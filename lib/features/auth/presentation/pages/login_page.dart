@@ -65,11 +65,11 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 32),
               AuthTextField(
-                  labelText: 'Enter Your Email/Phone',
+                  labelText: 'Enter Your Email',
                   borderRadius: 8,
                   prefixIcon: const Icon(Icons.account_circle_rounded),
                   obscureText: false,
-                  controller: _emailController,
+                  controller: _emailController, hintText: 'Email',
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -84,6 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     onPressed: _togglePasswordVisibility,
                   ),
+                  hintText: 'Password',
               ),
               const SizedBox(height: 8),
               Align(

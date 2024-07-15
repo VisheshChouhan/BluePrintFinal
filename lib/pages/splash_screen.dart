@@ -49,7 +49,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
             if ("admin" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => ConnectPage()),
+                // MaterialPageRoute(builder: (context) => ConnectPage()),
+                MaterialPageRoute(builder: (context) => AdminHomePageOld(
+                  adminName: data["name"],
+                  adminEmail: data["email"],
+                  adminPhone: data["phone"],
+                  adminDepartment: data["department"],
+                  adminUniqueId: data["uniqueId"],
+                )),
               );
             } else if ("coordinator" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(

@@ -72,7 +72,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 borderRadius: 8,
                 prefixIcon: const Icon(Icons.email),
                 obscureText: false,
-                controller: _emailController,
+                controller: _emailController, hintText: 'Email',
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -80,7 +80,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 borderRadius: 8,
                 prefixIcon: const Icon(Icons.account_circle_outlined),
                 obscureText: false,
-                controller: _nameController,
+                controller: _nameController, hintText: 'Name',
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -88,7 +88,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 borderRadius: 8,
                 prefixIcon: const Icon(Icons.phone),
                 obscureText: false,
-                controller: _phoneController,
+                controller: _phoneController, hintText: 'Phone',
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -96,7 +96,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 borderRadius: 8,
                 prefixIcon: const Icon(Icons.account_balance_rounded),
                 obscureText: false,
-                controller: _departmentController,
+                controller: _departmentController, hintText: 'Department',
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -104,7 +104,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 borderRadius: 8,
                 prefixIcon: const Icon(Icons.key),
                 obscureText: false,
-                controller: _secretKeyController,
+                controller: _secretKeyController, hintText: 'Secret Key',
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -118,7 +118,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     _obscureText ? Icons.visibility : Icons.visibility_off,
                   ),
                   onPressed: _togglePasswordVisibility,
-                ),
+                ), hintText: 'Password',
               ),
               const SizedBox(height: 16),
               AuthButton(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AuthTextField extends StatelessWidget {
   final Widget prefixIcon;
   final String labelText;
+  final String hintText;
   final double borderRadius;
   final bool obscureText;
   final TextEditingController controller;
@@ -10,6 +11,7 @@ class AuthTextField extends StatelessWidget {
   AuthTextField({
     super.key,
     required this.labelText,
+    required this.hintText,
     required this.borderRadius,
     required this.prefixIcon,
     required this.obscureText,
@@ -25,6 +27,7 @@ class AuthTextField extends StatelessWidget {
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
         labelText: labelText,
+        hintText: hintText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
