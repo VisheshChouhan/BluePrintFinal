@@ -3,18 +3,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class StudentAttendancePage extends StatefulWidget {
-  final String classCode;
-  final String className;
+class CoordinatorStudentAttendancePage extends StatefulWidget {
   final String studentCode;
   final String studentName;
-  const StudentAttendancePage({super.key, required this.classCode,required this.className, required this.studentCode, required this.studentName});
+  final String classCode;
+
+  const CoordinatorStudentAttendancePage(
+      {super.key,
+      required this.studentCode,
+      required this.studentName,
+      required this.classCode});
 
   @override
-  State<StudentAttendancePage> createState() => _StudentAttendancePageState();
+  State<CoordinatorStudentAttendancePage> createState() =>
+      _CoordinatorStudentAttendancePageState();
 }
 
-class _StudentAttendancePageState extends State<StudentAttendancePage> {
+class _CoordinatorStudentAttendancePageState
+    extends State<CoordinatorStudentAttendancePage> {
   Color primaryColor = const Color.fromRGBO(1, 94, 127, 1);
   Color blueColor = const Color.fromRGBO(0, 152, 206, 1.0);
   @override
@@ -38,9 +44,9 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                 Text(
                   "Attendance of ${widget.studentName}",
                   style:
-                  GoogleFonts.openSans(fontSize: 20, color: Colors.white),
+                      GoogleFonts.openSans(fontSize: 20, color: Colors.white),
                 ),
-                Text("Attendance of ${widget.studentName}",
+                Text("Attendance of ${widget.studentCode}",
                     style: GoogleFonts.openSans(
                         fontSize: 15, color: Colors.white70)),
               ])),
@@ -69,7 +75,7 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
             itemBuilder: (context, index) {
               // Extract data from each document
               final Map<String, dynamic> data =
-              documents[index].data() as Map<String, dynamic>;
+                  documents[index].data() as Map<String, dynamic>;
 
               return DateTile(data: data);
             },

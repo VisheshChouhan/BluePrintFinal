@@ -1,3 +1,4 @@
+import 'package:blue_print/pages/coordinator_pages/attendance_by_dates.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -70,9 +71,9 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) => {
-                'studentCode': doc['studentCode'].toString(),
-                'studentName': doc['studentName'].toString(),
-              })
+        'studentCode': doc['studentCode'].toString(),
+        'studentName': doc['studentName'].toString(),
+      })
           .toList();
     });
   }
@@ -88,9 +89,9 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) => {
-                'studentCode': doc['studentCode'].toString(),
-                'studentName': doc['studentName'].toString(),
-              })
+        'studentCode': doc['studentCode'].toString(),
+        'studentName': doc['studentName'].toString(),
+      })
           .toList();
     });
   }
@@ -143,7 +144,7 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
                       DocumentSnapshot doc = await docRef.get();
                       if (doc.exists) {
                         int currentValue =
-                            int.parse(doc['totalPresentStudents']);
+                        int.parse(doc['totalPresentStudents']);
                         int newValue = currentValue - 1;
 
                         await docRef.update(
@@ -181,7 +182,7 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
                       DocumentSnapshot doc = await docRef.get();
                       if (doc.exists) {
                         int currentValue =
-                            int.parse(doc['totalPresentStudents']);
+                        int.parse(doc['totalPresentStudents']);
                         int newValue = currentValue + 1;
 
                         await docRef.update(
@@ -203,6 +204,8 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
       },
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -233,8 +236,9 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
             )
           ],
         ),
+
       ),
-      body: SizedBox(height: 700,child: Expanded(child: StreamBuilder<List<Map<String, String>>>(
+      body:Container(child: Expanded(child: StreamBuilder<List<Map<String, String>>>(
         stream: getAllStudents(),
         builder: (context, allStudentsSnapshot) {
           if (allStudentsSnapshot.hasError) {
@@ -266,17 +270,17 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
                 itemBuilder: (context, index) {
                   final student = allStudents[index];
                   final isPresent = presentStudents.any((presentStudent) =>
-                      presentStudent['studentCode'] == student['studentCode']);
+                  presentStudent['studentCode'] == student['studentCode']);
 
                   return CustomCheckBox(
-                      onChanged: (bool? value) {
-                        _confirmAttendanceChange(context, student, isPresent);
-                      },
-                      student: student,
-                      isPresent: isPresent,
-                      classCode: widget.classCode,
-                      date: widget.date,
-                    )
+                    onChanged: (bool? value) {
+                      _confirmAttendanceChange(context, student, isPresent);
+                    },
+                    student: student,
+                    isPresent: isPresent,
+                    classCode: widget.classCode,
+                    date: widget.date,
+                  )
                   ;
                 },
               );
@@ -284,6 +288,8 @@ class _CoordinatorAttendancePageState extends State<CoordinatorAttendancePage> {
           );
         },
       ),
-    )));
+      )),
+    );
+
   }
 }

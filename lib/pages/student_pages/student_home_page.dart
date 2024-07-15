@@ -27,7 +27,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
 
     return Scaffold(
       key: _scaffoldKey,
-      extendBodyBehindAppBar: true,
+      // extendBodyBehindAppBar: true,
         drawer: Drawer(
           child: ListView(
             padding: EdgeInsets.zero,
@@ -122,7 +122,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-              height: 200,
+              height: 100,
               color: Colors.transparent,
 
             ),
@@ -165,7 +165,8 @@ class _StudentHomePageState extends State<StudentHomePage> {
                                       return StudentClassTile(
                                         className: Class["className"],
                                         classCode: Class["classCode"],
-                                        studentUID: widget.studentUID,
+                                        studentCode: widget.studentUID,
+                                        studentName: widget.studentName
                                       );
                                     });
                               } else if (snapshot.hasError) {
