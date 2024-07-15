@@ -357,7 +357,7 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                 ),
               ),
               if (_mode == Mode.Enroll)
-                _isConnected ? _enrollStudent() : Container(padding: EdgeInsets.all(16), child: Text("Enroll check")),
+                !_isConnected ? _enrollStudent() : Container(padding: EdgeInsets.all(16), child: Text("Enroll check")),
               SizedBox(height: 16,),
               Container(
                 color: _mode == Mode.Delete ? MyColorThemeTheme.whiteColor : MyColorThemeTheme.backgroundColor,
@@ -471,23 +471,23 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
   }
 
   Widget _enrollStudent() {
-    final _formKey = GlobalKey<FormState>();
+    // final _formKey = GlobalKey<FormState>();
     return Container(
       child: Column(
         children: [
-          Form(
-            key: _formKey,
-            child: TextFormField(
-              controller: userSerialController,
-              decoration: InputDecoration(labelText: 'Enter user unique ID'),
-            ),
+          Column(
+            children: <Widget>[
+              TextField(
+                controller: userSerialController,
+                decoration: InputDecoration(labelText: 'Enter user unique ID'),
+                // autofocus: true,
+              ),
+            ],
           ),
           SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _enrollFinger(userSerial: userSerialController.text);
-              }
+              _enrollFinger(userSerial: userSerialController.text);
             },
             child: const Text('Submit'),
           ),
