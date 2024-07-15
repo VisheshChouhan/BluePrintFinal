@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:bluetooth_enable_fork/bluetooth_enable_fork.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 // import 'attendance_screen.dart';
 
@@ -26,10 +27,6 @@ class TeacherAttendancePage extends StatefulWidget {
 }
 
 class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
-
-
-
-
   List<BluetoothDevice> _pairedDevices = [];
   BluetoothConnection? _connection;
   bool _isConnected = false;
@@ -61,9 +58,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
     BluetoothEnable.enableBluetooth.then((result) {
       if (result == "true") {
         // Bluetooth has been enabled
-
-      }
-      else if (result == "false") {
+      } else if (result == "false") {
         // Bluetooth has not been enabled
       }
     });
@@ -76,15 +71,12 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
       });
     });
 
-    // _checkBluetooth();
+    isExpanded = true;
 
+    // _checkBluetooth();
   }
 
-
-
-
-  void refreshBluetoothDevicesList()
-  {
+  void refreshBluetoothDevicesList() {
     FlutterBluetoothSerial.instance
         .getBondedDevices()
         .then((List<BluetoothDevice> bondedDevices) {
@@ -92,7 +84,6 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
         _pairedDevices = bondedDevices;
       });
     });
-
   }
 
   @override
@@ -444,6 +435,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
       });
 
       _showDialog('Connected', 'Device connected successfully!');
+      isExpanded = !isExpanded;
     } catch (exception) {
       setState(() {
         _isConnecting = false;
@@ -453,118 +445,158 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
     }
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    Color primaryColor = const Color.fromRGBO(1, 94, 127, 1);
+    Color blueColor = const Color.fromRGBO(0, 152, 206, 1.0);
 
+    return Scaffold(
         body: SingleChildScrollView(
-          child: Stack(
+      child: Stack(
+        children: [
+          Column(
             children: [
-              Column(
+              Container(
+                padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                decoration: BoxDecoration(
+                  // color: primaryColor
+                ),
+                child: 
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(onPressed: (){refreshBluetoothDevicesList();}, child: Text("Refresh")),
-                  ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          isExpanded = !isExpanded;
-                        });
-                      },
-                      child: Text("Expand")),
-                  AnimatedContainer(
-                    duration: Duration(milliseconds: 500),
-                    height: isExpanded ? 600.0 : 0.0,
-                    child: Expanded(
-                      child: ListView.builder(
-                        itemCount: _pairedDevices.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(
-                                _pairedDevices[index].name ?? 'Unknown Device'),
-                            trailing: ElevatedButton(
-                              child: Text('Connect'),
-                              onPressed: _isConnected || _isConnecting
-                                  ? null
-                                  : () => _connectDevice(_pairedDevices[index]),
-                            ),
-                          );
+                  Row(
+                    children: [
+                      Text("All Bluetooth devices",
+                        style: GoogleFonts.openSans(
+                          // color: Colors.white,
+
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.refresh),
+                        onPressed: () {
+                          // Refresh action
+                          refreshBluetoothDevicesList();
                         },
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        espOutput = "changed";
-                      });
-                    },
-                    child: Text("Change"),
-                  ),
-
-                  ElevatedButton(
-                    child: Text('Setup Device'),
-                    onPressed: _isConnected
-                        ? () async {
-                            // String tempStudentCode = "FINGER1";
-                            // String tempStudentTemplate = "03035C1A1C013501800000000000000000000000000000000000000000000000000000000000000000000000000000000500060079000000C0CCC33030F33CFFFFF3FBFBAABAAAA9AAAAAA66555554555545544401010101010101010101010101010101010101010101010101010101010101010101010101010101010101011A96969E7029A77E63AC265E5534515E6FBA905E30BB52BE623FA6FE6C4366DE52C3D1DE411B665F5F27D01F64B9D05F1EBA147F3BBB683F2F42D2FF35AA529C33A6D3BD30B2697A3134927A389A12383DAED25744AA903444B1D1B428992872271754730AB8403E000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003035A1A0001200181000000000000000000000000000000000000000000000000000000000000000000000000000000030006006D000000C00F0CCC3FCFF33FFFFFEEEAAAAAAAAAA995555555555555040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-                            //
-                            //
-                            // String command = "t-1-$tempStudentCode-$tempStudentTemplate";
-                            _connection?.output
-                                .add(Uint8List.fromList(utf8.encode("c")));
-                            await _connection?.output.allSent;
-                          }
-                        : null,
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    espOutput,
-                  ),
-                  SizedBox(height: 10),
-
-                  ElevatedButton(
-                    child: Text('Fetch Attendance Data'),
-                    onPressed: _isConnected
-                        ? () async {
-                            _connection?.output
-                                .add(Uint8List.fromList(utf8.encode("s")));
-                            await _connection?.output.allSent;
-                          }
-                        : null,
-                  ),
-                  // Conditionally show Button 2 and Button 3 based on showOptionalButtonsif (widget.showOptionalButtons) ...[
-                  ElevatedButton(
-                    child: Text('Reset Attendance Store'),
-                    onPressed: _isConnected
-                        ? () {
-                            _connection?.output
-                                .add(Uint8List.fromList(utf8.encode("r")));
-                          }
-                        : null,
-                  ),
+                      IconButton(
+                        icon: Icon(Icons.expand_more),
+                        onPressed: () {
+                          // Expand action
+                          setState(() {
+                            isExpanded = !isExpanded;
+                          });
+                        },
+                      ),
+                    ],
+                  )
                 ],
-              ),
-              // Show a modal dialog with a progress indicator while connecting
-              if (_showConnectingDialog) ...[
-                const Opacity(
-                  opacity: 0.6,
-                  child: ModalBarrier(
-                    dismissible: false,
-                    color: Colors.grey,
+              ),),
+              // ElevatedButton(onPressed: (){refreshBluetoothDevicesList();}, child: Text("Refresh")),
+              // ElevatedButton(
+              //     onPressed: () {
+              //       setState(() {
+              //         isExpanded = !isExpanded;
+              //       });
+              //     },
+              //     child: Text("Expand")),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 500),
+                height: isExpanded ? 600.0 : 0.0,
+                child: Expanded(
+                  child: ListView.builder(
+                    itemCount: _pairedDevices.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(
+                            _pairedDevices[index].name ?? 'Unknown Device'),
+                        trailing: ElevatedButton(
+                          child: Text('Connect'),
+                          onPressed: _isConnected || _isConnecting
+                              ? null
+                              : () => _connectDevice(_pairedDevices[index]),
+                        ),
+                      );
+                    },
                   ),
                 ),
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     setState(() {
+              //       espOutput = "changed";
+              //     });
+              //   },
+              //   child: Text("Change"),
+              // ),
+
+              ElevatedButton(
+                child: Text('Setup Device'),
+                onPressed: _isConnected
+                    ? () async {
+                        // String tempStudentCode = "FINGER1";
+                        // String tempStudentTemplate = "03035C1A1C013501800000000000000000000000000000000000000000000000000000000000000000000000000000000500060079000000C0CCC33030F33CFFFFF3FBFBAABAAAA9AAAAAA66555554555545544401010101010101010101010101010101010101010101010101010101010101010101010101010101010101011A96969E7029A77E63AC265E5534515E6FBA905E30BB52BE623FA6FE6C4366DE52C3D1DE411B665F5F27D01F64B9D05F1EBA147F3BBB683F2F42D2FF35AA529C33A6D3BD30B2697A3134927A389A12383DAED25744AA903444B1D1B428992872271754730AB8403E000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003035A1A0001200181000000000000000000000000000000000000000000000000000000000000000000000000000000030006006D000000C00F0CCC3FCFF33FFFFFEEEAAAAAAAAAA995555555555555040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+                        //
+                        //
+                        // String command = "t-1-$tempStudentCode-$tempStudentTemplate";
+                        _connection?.output
+                            .add(Uint8List.fromList(utf8.encode("c")));
+                        await _connection?.output.allSent;
+                      }
+                    : null,
+              ),
+              SizedBox(height: 10),
+              Text(
+                espOutput,
+              ),
+              SizedBox(height: 10),
+
+              ElevatedButton(
+                child: Text('Fetch Attendance Data'),
+                onPressed: _isConnected
+                    ? () async {
+                        _connection?.output
+                            .add(Uint8List.fromList(utf8.encode("s")));
+                        await _connection?.output.allSent;
+                      }
+                    : null,
+              ),
+              // Conditionally show Button 2 and Button 3 based on showOptionalButtonsif (widget.showOptionalButtons) ...[
+              ElevatedButton(
+                child: Text('Reset Attendance Date'),
+                onPressed: _isConnected
+                    ? () {
+                        _connection?.output
+                            .add(Uint8List.fromList(utf8.encode("r")));
+                      }
+                    : null,
+              ),
             ],
           ),
-        ));
+          // Show a modal dialog with a progress indicator while connecting
+          if (_showConnectingDialog) ...[
+            const Opacity(
+              opacity: 0.6,
+              child: ModalBarrier(
+                dismissible: false,
+                color: Colors.grey,
+              ),
+            ),
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ],
+        ],
+      ),
+    ));
   }
 }
