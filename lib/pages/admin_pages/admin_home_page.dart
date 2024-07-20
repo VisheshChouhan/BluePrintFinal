@@ -487,6 +487,20 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
           SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
+              setState(() {
+                espOutput = "changed";
+              });
+            },
+            child: Text("Change"),
+          ),
+          Text(
+            espOutput,
+          ),
+
+          SizedBox(height: 10),
+
+          ElevatedButton(
+            onPressed: () {
               _enrollFinger(userSerial: userSerialController.text);
             },
             child: const Text('Submit'),
