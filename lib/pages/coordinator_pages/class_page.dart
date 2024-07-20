@@ -77,10 +77,8 @@ class _ClassPageState extends State<ClassPage> {
             .doc(teacherCode)
             .collection("classes")
             .doc(widget.classCode)
-            .set({
-          "courseCode": widget.classCode,
-          "courseName": widget.className
-        });
+            .set(
+                {"classCode": widget.classCode, "className": widget.className});
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Teacher Assigned Succesfully"),
@@ -153,7 +151,9 @@ class _ClassPageState extends State<ClassPage> {
                   Icons.arrow_back,
                   color: Colors.white,
                 ),
-                onPressed: (){Navigator.pop(context);},
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -315,7 +315,10 @@ class AttendanceByStudents extends StatelessWidget {
               final Map<String, dynamic> data =
                   documents[index].data() as Map<String, dynamic>;
 
-              return StudentDetailTile(data: data, classCode: widget.classCode,);
+              return StudentDetailTile(
+                data: data,
+                classCode: widget.classCode,
+              );
             },
           );
         },
@@ -328,7 +331,8 @@ class StudentDetailTile extends StatelessWidget {
   final String classCode;
   const StudentDetailTile({
     super.key,
-    required this.data, required this.classCode,
+    required this.data,
+    required this.classCode,
   });
 
   final Map<String, dynamic> data;
@@ -343,7 +347,7 @@ class StudentDetailTile extends StatelessWidget {
               builder: (context) => CoordinatorStudentAttendancePage(
                     studentCode: data['studentCode'].toString().toUpperCase(),
                     studentName: data['studentName'].toString().toUpperCase(),
-                    classCode:classCode ,
+                    classCode: classCode,
                   )));
         },
         child: Container(
@@ -398,7 +402,8 @@ class AttendancyByDates extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return SingleChildScrollView(
+        child: Column(
       children: [
         SizedBox(
             height: 700,
@@ -444,6 +449,6 @@ class AttendancyByDates extends StatelessWidget {
                   ),
                 ])),
       ],
-    );
+    ));
   }
 }

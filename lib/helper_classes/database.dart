@@ -59,6 +59,16 @@ class DatabaseServices{
              }
              else if(securityKey == data["teacher"].toString())
              {
+
+               await db.collection('teacher').doc(uniqueId).set({
+                 'name': name,
+                 'email': email,
+                 'department': department,
+                 'phone': phone,
+                 'uniqueId': uniqueId,
+                 'role': "teacher"
+
+               });
                return await db.collection('users').doc(uid).set({
                  'name': name,
                  'email': email,
