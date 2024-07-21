@@ -80,7 +80,11 @@ class _SplashScreenState extends State<SplashScreen> {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => StudentHomePage(
                       studentUID: data["studentCode"],
-                      studentName: data["studentName"])));
+                      studentName: data["studentName"],
+                      studentEmail: data["email"],
+                      studentPhone: data["phone"],
+                      studentDepartment: data["department"],)));
+
             }
           },
           onError: (e) => print("Error getting document: $e"),

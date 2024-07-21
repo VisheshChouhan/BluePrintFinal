@@ -6,11 +6,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../features/roles/student/presentation/pages/profile_page.dart';
+
 class StudentHomePage extends StatefulWidget {
   final String studentUID;
   final String studentName;
+  final String studentEmail;
+  final String studentPhone;
+  final String studentDepartment;
   const StudentHomePage(
-      {super.key, required this.studentUID, required this.studentName});
+      {super.key,
+        required this.studentUID,
+        required this.studentName,
+        required this.studentEmail,
+        required this.studentPhone,
+        required this.studentDepartment});
 
   @override
   State<StudentHomePage> createState() => _StudentHomePageState();
@@ -57,8 +67,17 @@ class _StudentHomePageState extends State<StudentHomePage> {
                 leading: Icon(Icons.account_circle_outlined),
                 title: Text('Profile'),
                 onTap: () {
-                  Navigator.pop(context); // Close the drawer
-                  // Navigate to the settings screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                        studentName: widget.studentName,
+                        studentEmail: widget.studentEmail,
+                        studentPhone: widget.studentPhone,
+                        studentDepartment: widget.studentDepartment,
+                      ),
+                    ),
+                  );
                 },
               ),
               ListTile(
