@@ -539,47 +539,73 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
               //   child: Text("Change"),
               // ),
 
-              ElevatedButton(
-                child: Text('Setup Device'),
-                onPressed: _isConnected
-                    ? () async {
-                        // String tempStudentCode = "FINGER1";
-                        // String tempStudentTemplate = "03035C1A1C013501800000000000000000000000000000000000000000000000000000000000000000000000000000000500060079000000C0CCC33030F33CFFFFF3FBFBAABAAAA9AAAAAA66555554555545544401010101010101010101010101010101010101010101010101010101010101010101010101010101010101011A96969E7029A77E63AC265E5534515E6FBA905E30BB52BE623FA6FE6C4366DE52C3D1DE411B665F5F27D01F64B9D05F1EBA147F3BBB683F2F42D2FF35AA529C33A6D3BD30B2697A3134927A389A12383DAED25744AA903444B1D1B428992872271754730AB8403E000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003035A1A0001200181000000000000000000000000000000000000000000000000000000000000000000000000000000030006006D000000C00F0CCC3FCFF33FFFFFEEEAAAAAAAAAA995555555555555040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-                        //
-                        //
-                        // String command = "t-1-$tempStudentCode-$tempStudentTemplate";
-                        _connection?.output
-                            .add(Uint8List.fromList(utf8.encode("c")));
-                        await _connection?.output.allSent;
-                      }
-                    : null,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    minimumSize: Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
+                    ), // Background color of the button
+                  ),
+                  child: Text('Setup Device'),
+                  onPressed: _isConnected
+                      ? () async {
+
+                    _connection?.output
+                        .add(Uint8List.fromList(utf8.encode("c")));
+                    await _connection?.output.allSent;
+                  }
+                      : null,
+                ),
+
+
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    minimumSize: Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
+                    ), // Background color of the button
+                  ),
+                  child: Text('Fetch Attendance\n Data'),
+                  onPressed: _isConnected
+                      ? () async {
+                    _connection?.output
+                        .add(Uint8List.fromList(utf8.encode("s")));
+                    await _connection?.output.allSent;
+                  }
+                      : null,
+                ),
+                // Conditionally show Button 2 and Button 3 based on showOptionalButtonsif (widget.showOptionalButtons) ...[
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    minimumSize: Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
+                    ), // Background color of the button
+                  ),
+                  child: Text('Reset Attendance \nData'),
+                  onPressed: _isConnected
+                      ? () {
+                    _connection?.output
+                        .add(Uint8List.fromList(utf8.encode("r")));
+                  }
+                      : null,
+                ),
+              ],
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 10,),
               Text(
                 espOutput,
               ),
-              SizedBox(height: 10),
 
-              ElevatedButton(
-                child: Text('Fetch Attendance Data'),
-                onPressed: _isConnected
-                    ? () async {
-                        _connection?.output
-                            .add(Uint8List.fromList(utf8.encode("s")));
-                        await _connection?.output.allSent;
-                      }
-                    : null,
-              ),
-              // Conditionally show Button 2 and Button 3 based on showOptionalButtonsif (widget.showOptionalButtons) ...[
-              ElevatedButton(
-                child: Text('Reset Attendance Date'),
-                onPressed: _isConnected
-                    ? () {
-                        _connection?.output
-                            .add(Uint8List.fromList(utf8.encode("r")));
-                      }
-                    : null,
-              ),
+
+
             ],
           ),
           // Show a modal dialog with a progress indicator while connecting

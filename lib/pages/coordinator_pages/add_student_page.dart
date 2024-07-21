@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
+import 'package:blue_print/assets/my_color_theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -77,15 +78,8 @@ class _AddStudentPageState extends State<AddStudentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.deepPurple,
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            // Status bar color
-            statusBarColor: Colors.white,
-            // Status bar brightness (optional)
-            statusBarIconBrightness:
-                Brightness.dark, // For Android (dark icons)
-            statusBarBrightness: Brightness.light, // For iOS (dark icons)
-          ),
+          backgroundColor: MyColorThemeTheme.visheshPrimaryColor,
+          leading: IconButton(icon: Icon(Icons.arrow_back, color: Colors.white,),onPressed: (){Navigator.pop(context);},),
           title: const Text("Add Students",
               style: TextStyle(
                 color: Colors.white,
@@ -113,7 +107,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple),
+                    backgroundColor: MyColorThemeTheme.visheshPrimaryColor),
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -200,13 +194,14 @@ class _AddStudentPageState extends State<AddStudentPage> {
                   /*_pickFile();*/
                 },
                 child: Text("Select File",
-                    style: GoogleFonts.abel(
+                    style: GoogleFonts.openSans(
                       textStyle: const TextStyle(
-                          fontSize: 30, fontWeight: FontWeight.bold),
+                          fontSize: 30, color: Colors.white),
                     )),
               ),
             ),
 
+            Text("Student that can't be enrolled."),
             //Unable to Enroll Student List
             Expanded(
               child: ListView.builder(
@@ -215,6 +210,9 @@ class _AddStudentPageState extends State<AddStudentPage> {
                 shrinkWrap: true,
                 itemBuilder: (_, index) {
                   return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero, // Set the border radius to zero
+                    ),
                     margin: const EdgeInsets.all(3),
                     color: index == 0 ? Colors.blue : Colors.white,
                     child: IntrinsicHeight(
@@ -249,8 +247,8 @@ class _AddStudentPageState extends State<AddStudentPage> {
                           const SizedBox(
                             width: 10,
                           ),
-                          const VerticalDivider(
-                            color: Colors.deepPurple,
+                          VerticalDivider(
+                            color: MyColorThemeTheme.visheshPrimaryColor,
                             thickness: 2,
                           ),
                           const SizedBox(
@@ -277,6 +275,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                 },
               ),
             ),
+            Text("Student successfully enrolled."),
             Expanded(
               child: ListView.builder(
                 itemCount: _data.length,
@@ -284,6 +283,9 @@ class _AddStudentPageState extends State<AddStudentPage> {
                 shrinkWrap: true,
                 itemBuilder: (_, index) {
                   return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero, // Set the border radius to zero
+                    ),
                     margin: const EdgeInsets.all(3),
                     color: index == 0 ? Colors.blue : Colors.white,
                     child: IntrinsicHeight(
@@ -316,14 +318,14 @@ class _AddStudentPageState extends State<AddStudentPage> {
                             style: TextStyle(fontSize: index == 0 ? 18 : 15, fontWeight: index == 0 ? FontWeight.bold :FontWeight.normal,color: index == 0 ? Colors.red : Colors.black),),*/
                           ),
                           const SizedBox(
-                            width: 10,
+                            width: 2,
                           ),
-                          const VerticalDivider(
-                            color: Colors.deepPurple,
+                           VerticalDivider(
+                            color: MyColorThemeTheme.visheshPrimaryColor,
                             thickness: 2,
                           ),
                           const SizedBox(
-                            width: 10,
+                            width: 2,
                           ),
                           Container(
                             color: index == 0 ? Colors.blue : Colors.white,
