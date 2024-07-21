@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:blue_print/assets/my_color_theme.dart';
+import 'package:blue_print/features/auth/presentation/widgets/auth_button.dart';
+import 'package:blue_print/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:blue_print/models/MyButton.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,7 +43,8 @@ class AdminHomePageOld extends StatefulWidget {
   State<AdminHomePageOld> createState() => _AdminHomePageOldState();
 }
 
-class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerProviderStateMixin {
+class _AdminHomePageOldState extends State<AdminHomePageOld>
+    with SingleTickerProviderStateMixin {
   Mode _mode = Mode.Connect;
   List<BluetoothDevice> _pairedDevices = [];
   BluetoothConnection? _connection;
@@ -76,7 +79,8 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
       duration: Duration(seconds: 1),
     )..repeat(reverse: true);
 
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _animation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
   }
 
   @override
@@ -103,7 +107,8 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
     setState(() {
       _isLoading = true;
     });
-    List<BluetoothDevice> bondedDevices = await FlutterBluetoothSerial.instance.getBondedDevices();
+    List<BluetoothDevice> bondedDevices =
+        await FlutterBluetoothSerial.instance.getBondedDevices();
     setState(() {
       _pairedDevices = bondedDevices;
       _isLoading = false;
@@ -117,7 +122,9 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
     });
     try {
       _isConnecting = true;
-      BluetoothConnection connection = await BluetoothConnection.toAddress(device.address).timeout(Duration(seconds: 10));
+      BluetoothConnection connection =
+          await BluetoothConnection.toAddress(device.address)
+              .timeout(Duration(seconds: 10));
       setState(() {
         _connection = connection;
         _isConnected = true;
@@ -187,7 +194,10 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
 
       if (data.startsWith("te")) {
         if (templateData.length == 1024) {
-          db.collection('students').doc(userSerialController.text.toUpperCase().replaceAll(' ', '')).set({
+          db
+              .collection('students')
+              .doc(userSerialController.text.toUpperCase().replaceAll(' ', ''))
+              .set({
             'template': templateData,
           });
           espOutputController.text = "";
@@ -230,7 +240,10 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
 
   List<String> _processReceivedData(String rawData) {
     List<String> lines = rawData.split('\n');
-    lines = lines.map((line) => line.trim()).where((line) => line.isNotEmpty && line != '%').toList();
+    lines = lines
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty && line != '%')
+        .toList();
 
     if (lines.isNotEmpty && lines[0] == 'Attendance List:') {
       lines.removeAt(0);
@@ -273,8 +286,18 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
         ),
         actions: [
           IconButton(
-            onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfilePage(adminName: widget.adminName, adminEmail: widget.adminEmail, adminPhone: widget.adminPhone, adminDepartment: widget.adminDepartment,),),);
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    adminName: widget.adminName,
+                    adminEmail: widget.adminEmail,
+                    adminPhone: widget.adminPhone,
+                    adminDepartment: widget.adminDepartment,
+                  ),
+                ),
+              );
             },
             icon: const Icon(
               Icons.account_circle_rounded,
@@ -285,14 +308,12 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
         ],
       ),
       body: SafeArea(
-
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-
                 color: _mode == Mode.Connect
                     ? MyColorThemeTheme.whiteColor
                     : MyColorThemeTheme.backgroundColor,
@@ -312,8 +333,10 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                       'Connect Device',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    SizedBox(width: 8,),
-                    if (_isConnected &&_animation != null)
+                    SizedBox(
+                      width: 8,
+                    ),
+                    if (_isConnected && _animation != null)
                       AnimatedBuilder(
                         animation: _animation,
                         builder: (context, child) {
@@ -321,7 +344,9 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                             width: 10,
                             height: 10,
                             decoration: BoxDecoration(
-                              color: _animation.value > 0.3 ? Colors.green : Colors.transparent,
+                              color: _animation.value > 0.3
+                                  ? Colors.green
+                                  : Colors.transparent,
                               shape: BoxShape.circle,
                             ),
                           );
@@ -332,9 +357,16 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
               ),
               if (_mode == Mode.Connect)
                 _isLoading
-                    ? Container(padding: EdgeInsets.all(16),child: Center(child: CircularProgressIndicator()))
-                    : Container(child: _isBluetoothEnabled ? _listOfAvailableDevices() : _bluetoothIsNotOn()),
-              SizedBox(height: 16,),
+                    ? Container(
+                        padding: EdgeInsets.all(16),
+                        child: Center(child: CircularProgressIndicator()))
+                    : Container(
+                        child: _isBluetoothEnabled
+                            ? _listOfAvailableDevices()
+                            : _bluetoothIsNotOn()),
+              SizedBox(
+                height: 16,
+              ),
               Container(
                 color: _mode == Mode.Enroll
                     ? MyColorThemeTheme.whiteColor
@@ -359,10 +391,22 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                 ),
               ),
               if (_mode == Mode.Enroll)
-                _isConnected ? (((espOutput.contains("error")) || (espOutput.contains("Successful")) || espOutput.contains("Output")) ? _enrollStudent() : _enrollBegin()) : Container(padding: EdgeInsets.all(16), child: Text("Enroll check")),
-              SizedBox(height: 16,),
+                _isConnected
+                    ? (((espOutput.contains("error")) ||
+                            (espOutput.contains("Successful")) ||
+                            espOutput.contains("Output"))
+                        ? _enrollStudent()
+                        : _enrollBegin())
+                    : Container(
+                        padding: EdgeInsets.all(16),
+                        child: Text("Enroll check")),
+              SizedBox(
+                height: 16,
+              ),
               Container(
-                color: _mode == Mode.Delete ? MyColorThemeTheme.whiteColor : MyColorThemeTheme.backgroundColor,
+                color: _mode == Mode.Delete
+                    ? MyColorThemeTheme.whiteColor
+                    : MyColorThemeTheme.backgroundColor,
                 child: Row(
                   children: [
                     Radio(
@@ -383,7 +427,8 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                 ),
               ),
               if (_mode == Mode.Delete)
-                Container(padding: EdgeInsets.all(16), child: Text("Delete check")),
+                Container(
+                    padding: EdgeInsets.all(16), child: Text("Delete check")),
             ],
           ),
         ),
@@ -422,7 +467,8 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Available Devices', style: Theme.of(context).textTheme.titleMedium),
+                Text('Available Devices',
+                    style: Theme.of(context).textTheme.titleMedium),
                 ElevatedButton(
                   onPressed: _checkBluetooth,
                   child: Text("Refresh"),
@@ -441,7 +487,9 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)),
-                          side: BorderSide(color: Theme.of(context).primaryColor, width: 0.3),
+                          side: BorderSide(
+                              color: Theme.of(context).primaryColor,
+                              width: 0.3),
                         ),
                       ),
                       child: SingleChildScrollView(
@@ -453,8 +501,15 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Icon(Icons.bluetooth),
-                                SizedBox(width: 8,),
-                                Text(_pairedDevices[index].name ?? 'Unknown Device', style: Theme.of(context).textTheme.titleMedium),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                    _pairedDevices[index].name ??
+                                        'Unknown Device',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium),
                               ],
                             ),
                             if (_isConnected) Text(' (Connected) '),
@@ -478,51 +533,61 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
   Widget _enrollStudent() {
     // final _formKey = GlobalKey<FormState>();
     return Container(
+      padding: EdgeInsets.all(16),
       child: Column(
+        mainAxisSize: MainAxisSize.max,
         children: [
-          Column(
-            children: <Widget>[
-              TextField(
-                controller: userSerialController,
-                decoration: InputDecoration(labelText: 'Enter user unique ID'),
-                // autofocus: true,
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-
+          AuthTextField(
+              labelText: 'Enter user unique ID',
+              hintText: 'Unique ID',
+              borderRadius: 8,
+              prefixIcon: const Icon(Icons.perm_identity),
+              obscureText: false,
+              controller: userSerialController),
+          SizedBox(height: 16),
           Text(
-            espOutput,
+            espOutput.contains("ep") ? espOutput.substring(4) : espOutput,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
-
-          SizedBox(height: 10),
-
-          ElevatedButton(
-            onPressed: () {
-              _enrollFinger(userSerial: userSerialController.text);
-            },
-            child: const Text('Submit'),
+          SizedBox(height: 16),
+          SizedBox(
+            width: 200,
+            child: AuthButton(
+              borderRadius: 8,
+              onPressed: () {
+                _enrollFinger(userSerial: userSerialController.text);
+              },
+              vertical: 16,
+              buttonBackgroundColor: Theme.of(context).primaryColor,
+              fontSize: 16,
+              text: 'Submit',
+              textColor: MyColorThemeTheme.whiteColor,
+            ),
           ),
         ],
       ),
     );
   }
 
-
   Widget _enrollBegin() {
     // final _formKey = GlobalKey<FormState>();
     return Container(
-      child: Column(
-        children: [
-
-          const SizedBox(width: 200,child: Center(child: LinearProgressIndicator())),
-
-          SizedBox(height: 10),
-
-          Text(
-            espOutput,
-          ),
-        ],
+      padding: EdgeInsets.all(32),
+      child: Center(
+        child: Column(
+          children: [
+            const SizedBox(
+                width: 200, child: Center(child: LinearProgressIndicator())),
+            const SizedBox(height: 16),
+            // Text(
+            //   espOutput,
+            // ),
+            Text(
+              espOutput.contains("ep") ? espOutput.substring(4) : espOutput,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
+        ),
       ),
     );
   }
