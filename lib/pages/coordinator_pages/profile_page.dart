@@ -4,14 +4,14 @@ import 'package:blue_print/features/roles/student/presentation/widgets/profile_i
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../pages/splash_screen.dart';
+import '../splash_screen.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String adminName;
-  final String adminEmail;
-  final String adminPhone;
-  final String adminDepartment;
-  const ProfilePage({super.key, required this.adminName, required this.adminEmail, required this.adminPhone, required this.adminDepartment});
+  final String coordinatorName;
+  final String coordinatorEmail;
+  final String coordinatorPhone;
+  final String coordinatorDepartment;
+  const ProfilePage({super.key, required this.coordinatorName, required this.coordinatorEmail, required this.coordinatorPhone, required this.coordinatorDepartment});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -30,14 +30,14 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 ProfileImage(),
                 SizedBox(height: 10,),
-                InfoText(text: widget.adminName, style: Theme.of(context).textTheme.headlineMedium!),
+                InfoText(text: widget.coordinatorName, style: Theme.of(context).textTheme.headlineMedium!),
                 SizedBox(height: 20.0,),
 
-                BasicInfo(onPressed: (){}, text: widget.adminEmail,),
+                BasicInfo(onPressed: (){}, text: widget.coordinatorEmail,),
                 SizedBox(height: 10.0,),
-                BasicInfo(onPressed: (){}, text: widget.adminDepartment,),
+                BasicInfo(onPressed: (){}, text: widget.coordinatorDepartment,),
                 SizedBox(height: 10.0,),
-                BasicInfo(onPressed: (){}, text: widget.adminPhone, iconData: Icons.edit,),
+                BasicInfo(onPressed: (){}, text: widget.coordinatorPhone, iconData: Icons.edit,),
                 SizedBox(height: 10.0,),
                 BasicInfo(onPressed: () async {
                   await FirebaseAuth.instance.signOut();

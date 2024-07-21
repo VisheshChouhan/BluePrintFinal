@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-import '../../features/roles/admin/presentation/pages/profile_page.dart';
+import 'profile_page.dart';
 
 enum Mode {
   Connect,

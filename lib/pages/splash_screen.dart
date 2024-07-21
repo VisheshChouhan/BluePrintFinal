@@ -63,7 +63,11 @@ class _SplashScreenState extends State<SplashScreen> {
                 MaterialPageRoute(
                     builder: (context) => CoordinatorHomePage(
                         coordinatorUID: data["uniqueId"],
-                        coordinatorName: data["name"])),
+                        coordinatorName: data["name"],
+                        coordinatorEmail: data["email"],
+                        coordinatorPhone: data["phone"],
+                        coordinatorDepartment: data["department"],
+                    )),
               );
             } else if ("teacher" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(
