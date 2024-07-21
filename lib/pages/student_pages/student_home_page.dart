@@ -117,7 +117,7 @@ class _StudentHomePageState extends State<StudentHomePage> {
             ],
           ),
 
-          Column(
+          SingleChildScrollView(child:Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -182,6 +182,6 @@ class _StudentHomePageState extends State<StudentHomePage> {
                         ),
                       ])),
             ],
-          )]));
+          ))]));
   }
 }
