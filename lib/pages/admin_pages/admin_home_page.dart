@@ -285,12 +285,14 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
         ],
       ),
       body: SafeArea(
+
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
+
                 color: _mode == Mode.Connect
                     ? MyColorThemeTheme.whiteColor
                     : MyColorThemeTheme.backgroundColor,
@@ -357,7 +359,7 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                 ),
               ),
               if (_mode == Mode.Enroll)
-                _isConnected ? _enrollStudent() : Container(padding: EdgeInsets.all(16), child: Text("Enroll check")),
+                _isConnected ? (((espOutput.contains("error")) || (espOutput.contains("Successful")) || espOutput.contains("Output")) ? _enrollStudent() : _enrollBegin()) : Container(padding: EdgeInsets.all(16), child: Text("Enroll check")),
               SizedBox(height: 16,),
               Container(
                 color: _mode == Mode.Delete ? MyColorThemeTheme.whiteColor : MyColorThemeTheme.backgroundColor,
@@ -442,19 +444,22 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
                           side: BorderSide(color: Theme.of(context).primaryColor, width: 0.3),
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(Icons.bluetooth),
-                              SizedBox(width: 8,),
-                              Text(_pairedDevices[index].name ?? 'Unknown Device', style: Theme.of(context).textTheme.titleMedium),
-                            ],
-                          ),
-                          if (_isConnected) Text('Connected'),
-                        ],
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(Icons.bluetooth),
+                                SizedBox(width: 8,),
+                                Text(_pairedDevices[index].name ?? 'Unknown Device', style: Theme.of(context).textTheme.titleMedium),
+                              ],
+                            ),
+                            if (_isConnected) Text(' (Connected) '),
+                          ],
+                        ),
                       ),
                       onPressed: _isConnected || _isConnecting
                           ? null
@@ -485,11 +490,37 @@ class _AdminHomePageOldState extends State<AdminHomePageOld> with SingleTickerPr
             ],
           ),
           SizedBox(height: 10),
+
+          Text(
+            espOutput,
+          ),
+
+          SizedBox(height: 10),
+
           ElevatedButton(
             onPressed: () {
               _enrollFinger(userSerial: userSerialController.text);
             },
             child: const Text('Submit'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _enrollBegin() {
+    // final _formKey = GlobalKey<FormState>();
+    return Container(
+      child: Column(
+        children: [
+
+          const SizedBox(width: 200,child: Center(child: LinearProgressIndicator())),
+
+          SizedBox(height: 10),
+
+          Text(
+            espOutput,
           ),
         ],
       ),
