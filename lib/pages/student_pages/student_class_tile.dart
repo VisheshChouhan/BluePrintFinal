@@ -74,7 +74,7 @@ class StudentClassTile extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(classCode,
+                                Text(classCode.toUpperCase(),
                                     style: GoogleFonts.roboto(
                                       textStyle: const TextStyle(
                                           // fontWeight: FontWeight.bold,

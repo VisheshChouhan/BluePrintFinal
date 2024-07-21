@@ -38,7 +38,7 @@ class _ClassPageState extends State<ClassPage> {
   Future checkExistingTeacher() async {
     var a = await db
         .collection('teacher')
-        .doc(_teacherUniqueCodeController.text.toString())
+        .doc(_teacherUniqueCodeController.text.toString().toUpperCase().trim())
         .get();
 
     if (!a.exists) {
@@ -53,7 +53,7 @@ class _ClassPageState extends State<ClassPage> {
     if (a.exists) {
       print('Teacher exists');
 
-      String teacherCode = _teacherUniqueCodeController.text.toString().trim();
+      String teacherCode = _teacherUniqueCodeController.text.toString().toUpperCase().trim();
       // String className = _classNameController.text.toString();
 
       if (_teacherUniqueCodeController.text.isNotEmpty) {
@@ -168,7 +168,7 @@ class _ClassPageState extends State<ClassPage> {
                     ),
                   ),
                   Text(
-                    widget.classCode,
+                    widget.classCode.toUpperCase(),
                     style: GoogleFonts.openSans(
                         fontSize: 15,
                         textStyle: TextStyle(color: Colors.white54)),
@@ -234,7 +234,7 @@ class _ClassPageState extends State<ClassPage> {
               actions: <Widget>[
                 IconButton(
                     onPressed: () => _showAddTeacherDialogBox(context),
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.person_add,
                       color: Colors.white,
                     )),
@@ -248,7 +248,7 @@ class _ClassPageState extends State<ClassPage> {
                                     className: widget.className,
                                   )));
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.school,
                       color: Colors.white,
                     ))

@@ -1,9 +1,11 @@
+import 'package:blue_print/assets/my_color_theme.dart';
 import 'package:blue_print/models/my_textfield.dart';
 import 'package:blue_print/pages/teacher_pages/custom_checkbox_tile.dart';
 import 'package:blue_print/pages/teacher_pages/custom_map.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class TeacherPresentStudentPage extends StatefulWidget {
@@ -40,14 +42,14 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     setState(() {
       if (isChecked) {
         selectedStudentCodes.add(studentCode);
-        CustomMap temp = new CustomMap({'studentCode': studentCode, 'studentName': studentName});
-        finallyPresentStudentMap
-            .add(temp);
+        CustomMap temp = new CustomMap(
+            {'studentCode': studentCode, 'studentName': studentName});
+        finallyPresentStudentMap.add(temp);
       } else {
         selectedStudentCodes.remove(studentCode);
-        CustomMap temp = new CustomMap({'studentCode': studentCode, 'studentName': studentName});
-        finallyPresentStudentMap
-            .remove(temp);
+        CustomMap temp = new CustomMap(
+            {'studentCode': studentCode, 'studentName': studentName});
+        finallyPresentStudentMap.remove(temp);
       }
     });
   }
@@ -55,20 +57,46 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        foregroundColor: MyColorThemeTheme.visheshPrimaryColor,
+        backgroundColor: MyColorThemeTheme.visheshPrimaryColor,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(widget.classCode.toUpperCase(), style: GoogleFonts.openSans(
+              color: Colors.white
+            ),),
+            Text(widget.className.toUpperCase(), style: GoogleFonts.openSans(
+                color: Colors.white,
+              fontSize: 15
+            ),),
+
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 40,
+            const SizedBox(
+              height: 10,
             ),
-            Text(widget.classCode),
-            Text(widget.className),
-            Text("Present Students: " + selectedStudentCodes.length.toString()),
-            Text("Absent Students : " +
-                (totalStudents - selectedStudentCodes.length).toString()),
-            Divider(),
+
+            Text("Present Students: ${selectedStudentCodes.length}"),
+            // Text("Absent Students : " +
+            //     (totalStudents - selectedStudentCodes.length).toString()),
+            const Divider(),
             SizedBox(
                 height: 500,
                 child: Column(
@@ -104,7 +132,6 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
                                       });
 
                                       finallyPresentStudentMap.add(temp);
-
                                     }
 
                                     return CustomCheckboxTile(
@@ -132,14 +159,27 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
                 controller: attendanceCode,
                 hintText: "Enter Unique Attendance Code",
                 obscureText: false),
-            Text(finallyPresentStudentMap.toString()),
-            ElevatedButton(onPressed: (){
-              if(attendanceCode.text.isNotEmpty){
-              storeAttendance();}
-              else{
-                ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text("Please Enter a Unique Attendance Code")));
-              }
-              }, child: Text("Store Attendance"))
+            // Text(finallyPresentStudentMap.toString()),
+            SizedBox(height: 10,),
+            Center(child:
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+
+                ),
+                foregroundColor: Colors.white,
+                backgroundColor: MyColorThemeTheme.blueColor
+              ),
+                onPressed: () {
+                  if (attendanceCode.text.isNotEmpty) {
+                    storeAttendance();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content:
+                            Text("Please Enter a Unique Attendance Code")));
+                  }
+                },
+                child: const Text("Store Attendance")))
           ],
         ),
       ),
@@ -153,7 +193,8 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     // Get the current date
     DateTime now = DateTime.now();
     // Format the date
-    String formattedDate = DateFormat('dd-MM-yyyy').format(now) + "-"+
+    String formattedDate = DateFormat('dd-MM-yyyy').format(now) +
+        "-" +
         attendanceCode.text.toString().trim();
     // Adding number of present Students
     db
@@ -161,14 +202,18 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
         .doc(widget.classCode)
         .collection("attendance")
         .doc(formattedDate)
-
-        .set({"date": formattedDate, "totalPresentStudents": finallyPresentStudentMap.length});
+        .set({
+      "date": formattedDate,
+      "totalPresentStudents": finallyPresentStudentMap.length.toString()
+    });
 
     print("finallyPresentStudentMap");
     print(finallyPresentStudentMap.toString());
     for (int i = 0; i < finallyPresentStudentMap.length; i++) {
-      String tempStudentCode = finallyPresentStudentMap.elementAt(i)["studentCode"];
-      String tempStudentName = finallyPresentStudentMap.elementAt(i)["studentName"];
+      String tempStudentCode =
+          finallyPresentStudentMap.elementAt(i)["studentCode"];
+      String tempStudentName =
+          finallyPresentStudentMap.elementAt(i)["studentName"];
       db
           .collection("classes")
           .doc(widget.classCode)
@@ -178,8 +223,8 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
           .doc(tempStudentCode)
           .set(finallyPresentStudentMap.elementAt(i).getInnerMap());
 
-
-      db.collection("students")
+      db
+          .collection("students")
           .doc(tempStudentCode)
           .collection("classes")
           .doc(widget.classCode)
@@ -188,8 +233,7 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
           .set({"date": formattedDate});
     }
 
-
-
-    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text("Data Successfully stored")));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(new SnackBar(content: Text("Data Successfully stored")));
   }
 }

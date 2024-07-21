@@ -15,8 +15,8 @@ class ClassCollectionPage extends StatefulWidget {
 }
 
 class _ClassCollectionPageState extends State<ClassCollectionPage> {
-  TextEditingController _classCodeController = new TextEditingController();
-  TextEditingController _classNameController = new TextEditingController();
+  final TextEditingController _classCodeController = new TextEditingController();
+  final TextEditingController _classNameController = new TextEditingController();
 
   FirebaseFirestore db = FirebaseFirestore.instance;
   String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
@@ -105,14 +105,14 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
                         color: blueColor,
                       ),
                     ),
-                    focusedBorder: OutlineInputBorder(
+                    focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Colors.blue,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
                 TextFormField(
@@ -126,7 +126,7 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
                         color: blueColor,
                       ),
                     ),
-                    focusedBorder: OutlineInputBorder(
+                    focusedBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Colors.blue,
                       ),
@@ -177,7 +177,7 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
             _showCreateClassDialogBox(context);
           },
           backgroundColor: blueColor,
-          child: Icon(
+          child: const Icon(
             Icons.add,
             size: 40.0,
             color: Colors.white, // Adjust icon size as needed
@@ -191,23 +191,23 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
             color: primaryColor,
           ),
           Column(children: [
-            SizedBox(
+            const SizedBox(
               height: 100,
             ),
             Container(
               decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(20)),
-              margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 40,
-                  ),
+                  // SizedBox(
+                  //   height: 40,
+                  // ),
                   const SizedBox(
-                    height: 25.0,
+                    height: 20.0,
                   ),
                   SizedBox(
-                      height: 640,
+                      height: 660,
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,

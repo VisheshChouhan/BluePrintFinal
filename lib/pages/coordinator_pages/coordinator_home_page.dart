@@ -98,10 +98,10 @@ class _CoordinatorHomePageState extends State<CoordinatorHomePage> {
                 style: GoogleFonts.openSans(
                     fontSize: 15, textStyle: TextStyle(color: Colors.white70)),
               ),
-              SizedBox(height: 10)
+              // SizedBox(height: 10)
             ]),
       ),
-      body: Center(child: ClassCollectionPage()),
+      body: const Center(child: ClassCollectionPage()),
 
     );
   }

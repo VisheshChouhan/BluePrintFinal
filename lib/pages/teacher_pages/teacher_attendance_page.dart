@@ -45,6 +45,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
 
   // To expand and collapse bluetooth devices
   bool isExpanded = false;
+  bool sendingData = false;
 
   FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -245,8 +246,18 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
         print("data is " + data);
         String tempClassCode =
             data.toString().substring(4).toUpperCase().trim();
+        setState(() {
+          sendingData = true;
+        });
+        String tempCommand = "c-${widget.classCode}";
+        _connection?.output.add(Uint8List.fromList(utf8.encode(tempCommand)));
+        await _connection?.output.allSent;
+
         List commandList = await setupClass(tempClassCode);
         sendBulkCommand(commandList);
+        setState(() {
+          sendingData = false;
+        });
       }
 
       if (data.startsWith("AS:")) {
@@ -454,6 +465,8 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
         body: SingleChildScrollView(
       child: Stack(
         children: [
+
+
           Column(
             children: [
               Container(
@@ -550,8 +563,10 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                       borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
                     ), // Background color of the button
                   ),
-                  child: Text('Setup Device'),
-                  onPressed: _isConnected
+                  child: Text('Setup Device', style: GoogleFonts.openSans(
+                      color: Colors.white
+                  ),),
+                  onPressed: _isConnected && !sendingData
                       ? () async {
 
                     _connection?.output
@@ -571,8 +586,10 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                       borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
                     ), // Background color of the button
                   ),
-                  child: Text('Fetch Attendance\n Data'),
-                  onPressed: _isConnected
+                  child: Text('Fetch Attendance\n Data', style: GoogleFonts.openSans(
+                      color: Colors.white
+                  ),),
+                  onPressed: _isConnected && !sendingData
                       ? () async {
                     _connection?.output
                         .add(Uint8List.fromList(utf8.encode("s")));
@@ -583,14 +600,16 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                 // Conditionally show Button 2 and Button 3 based on showOptionalButtonsif (widget.showOptionalButtons) ...[
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    minimumSize: Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
+                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    minimumSize: const Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
                     ), // Background color of the button
                   ),
-                  child: Text('Reset Attendance \nData'),
-                  onPressed: _isConnected
+                  child: Text('Reset Attendance \nData', style: GoogleFonts.openSans(
+                    color: Colors.white
+                  ),),
+                  onPressed: _isConnected && !sendingData
                       ? () {
                     _connection?.output
                         .add(Uint8List.fromList(utf8.encode("r")));
@@ -600,9 +619,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
               ],
               ),
               SizedBox(height: 10,),
-              Text(
-                espOutput,
-              ),
+              // Text(
+              //   espOutput,
+              // ),
 
 
 
@@ -621,8 +640,19 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
               child: CircularProgressIndicator(),
             ),
           ],
+          if (sendingData)  const SafeArea(child:
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+
+              Center(child:CircularProgressIndicator(),),
+
+            ],
+          ),),
         ],
       ),
-    ));
+    )
+    );
   }
 }

@@ -16,7 +16,7 @@ import 'admin_pages/admin_home_page.dart';
 // import 'package:teachers_app/pages/teacher_dashboard.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -42,8 +42,8 @@ class _SplashScreenState extends State<SplashScreen> {
         await docRef.get().then(
           (DocumentSnapshot doc) async {
             final data = doc.data() as Map<String, dynamic>;
-            print("Data");
-            print(data);
+            // print("Data");
+            // print(data);
 
             // Registering Each one in their respective Collection in database
 
@@ -91,10 +91,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return const  Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
+           mainAxisAlignment: MainAxisAlignment.center ,
+          crossAxisAlignment: CrossAxisAlignment.center,
+
+
           children: [
             // Container(
             //
@@ -103,24 +107,39 @@ class _SplashScreenState extends State<SplashScreen> {
             //       image: AssetImage("lib/assets/splash_screen_teacher.png"),
             //       fit: BoxFit.cover,
             //     )),
-            SizedBox(height: 20),
-            Text(
-              "Acadnect",
-              style: TextStyle(
-                fontSize: 40.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
 
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.0),
-              child: Text("Streamline Your Classroom ",
-                  style: TextStyle(fontSize: 15.0)),
-            ),
-            Text("The App that Helps You Stay Ahead of Your Tasks"),
+                    SizedBox(height: 20),
+                    Text(
+                      "BluePrint",
+                      style: TextStyle(
+                        fontSize: 40.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
 
-            SizedBox(height: 30),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 40.0),
+                      child: Text("Streamline Your Attendance ",
+                          style: TextStyle(fontSize: 15.0)),
+                    ),
+                  ],
+                )
+
+
+            ],)
+
+            // Text("The App that Helps You Stay Ahead of Your Tasks"),
+
+            // SizedBox(height: 30),
             // MyButton(onTap: (){
             //   Navigator.pushReplacement(context,
             //     MaterialPageRoute(builder: (context) => DashBoard()),);

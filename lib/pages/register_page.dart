@@ -165,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
         iconTheme: const IconThemeData(
           color: MyColorThemeTheme.whiteColor,
         ),
-        title: const Text("Registration",
+        title: const Text("Registration Form",
           style: TextStyle(
             color: Colors.white,
           ),
@@ -179,7 +179,7 @@ class _RegisterPageState extends State<RegisterPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               GeneralText(
-                text: 'Welcome Us',
+                text: 'Welcome',
                 fontSize: 24,
                 color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.bold,
@@ -318,7 +318,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 vertical: 16,
                 buttonBackgroundColor: Theme.of(context).primaryColor,
                 fontSize: 16,
-                text: 'Registered',
+                text: 'Register',
                 textColor: MyColorThemeTheme.whiteColor,
               ),
               const SizedBox(height: 16),
