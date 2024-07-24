@@ -1,4 +1,4 @@
-import 'package:blue_print/features/roles/admin/presentation/pages/profile_page.dart';
+import 'package:blue_print/pages/admin_pages/profile_page.dart';
 import 'package:blue_print/features/roles/admin/presentation/widgets/home_page_option.dart';
 import 'package:flutter/material.dart';
 
