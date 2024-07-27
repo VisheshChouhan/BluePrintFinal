@@ -26,6 +26,7 @@ class TeacherPresentStudentPage extends StatefulWidget {
 class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
   Set<dynamic> selectedStudentCodes = {};
   Set<CustomMap> finallyPresentStudentMap = {};
+  int initiallyPresentStudentsLength = 0;
   int totalStudents = 0;
   FirebaseFirestore db = FirebaseFirestore.instance;
   TextEditingController attendanceCode = new TextEditingController();
@@ -93,68 +94,114 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
               height: 10,
             ),
 
-            Text("Present Students: ${selectedStudentCodes.length}"),
+            // Text(selectedStudentCodes.toString()),
             // Text("Absent Students : " +
             //     (totalStudents - selectedStudentCodes.length).toString()),
-            const Divider(),
-            SizedBox(
-                height: 500,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection("classes")
-                              .doc(widget.classCode)
-                              .collection("students")
-                              .orderBy("studentName")
-                              .snapshots(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                                  snapshot) {
-                            if (snapshot.hasData) {
-                              return ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  itemCount: snapshot.data!.docs.length,
-                                  itemBuilder: (context, index) {
-                                    totalStudents += 1;
+            // const Divider(),
+            SingleChildScrollView(
+                child: Expanded(
+              child: SizedBox(
+                  height: 600,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("classes")
+                                .doc(widget.classCode)
+                                .collection("students")
+                                .orderBy("studentName")
+                                .snapshots(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<
+                                        QuerySnapshot<Map<String, dynamic>>>
+                                    snapshot) {
+                              if (snapshot.hasData) {
+                                totalStudents = 0;
+                                return ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    itemCount: snapshot.data!.docs.length,
+                                    itemBuilder: (context, index) {
+                                      totalStudents += 1;
 
-                                    final student = snapshot.data!.docs[index];
+                                      final student =
+                                          snapshot.data!.docs[index];
 
-                                    //Adding already present student in presentStudentMap
-                                    if (selectedStudentCodes.contains(
-                                        student["studentCode"].toString())) {
-                                      CustomMap temp = new CustomMap({
-                                        'studentCode': student["studentCode"],
-                                        'studentName': student["studentName"],
-                                      });
+                                      //Adding already present student in presentStudentMap
+                                      if (selectedStudentCodes.contains(
+                                          student["studentCode"].toString())) {
+                                        CustomMap temp = new CustomMap({
+                                          'studentCode': student["studentCode"],
+                                          'studentName': student["studentName"],
+                                        });
 
-                                      finallyPresentStudentMap.add(temp);
-                                    }
+                                        finallyPresentStudentMap.add(temp);
 
-                                    return CustomCheckboxTile(
-                                      studentName: student["studentName"],
-                                      studentCode: student["studentCode"],
-                                      isChecked: widget.initialPresentStudents
-                                          .contains(student["studentCode"]),
-                                      onCheckboxChanged: onCheckboxChanged,
-                                    );
-                                  });
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                child: Text('Error:${snapshot.error}'),
+                                        initiallyPresentStudentsLength += 1;
+                                      }
+
+                                      return CustomCheckboxTile(
+                                        studentName: student["studentName"],
+                                        studentCode: student["studentCode"],
+                                        isChecked: widget.initialPresentStudents
+                                            .contains(student["studentCode"]),
+                                        onCheckboxChanged: onCheckboxChanged,
+                                      );
+                                    });
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text('Error:${snapshot.error}'),
+                                );
+                              }
+                              return const Center(
+                                child: CircularProgressIndicator(),
                               );
-                            }
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
+                            },
+                          ),
                         ),
-                      ),
-                    ])),
+                      ])),
+            )),
             Divider(),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 30,
+                    // color: MyColorThemeTheme.blueColor,
+                    child: Center(
+                      child: Text(
+                        "Present Students: ${finallyPresentStudentMap.length}",
+                        style: GoogleFonts.openSans(
+                            color: MyColorThemeTheme.greenColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 30,
+                    // color: MyColorThemeTheme.blueColor,
+                    child: Center(
+                      child: Text(
+                        "Absent Students: ${totalStudents - finallyPresentStudentMap.length}",
+                        style: GoogleFonts.openSans(
+                            color: MyColorThemeTheme.redColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => setState(() {}),
+                  icon: const Icon(Icons.refresh),
+                )
+              ],
+            ),
             MyTextField(
                 controller: attendanceCode,
                 hintText: "Enter Unique Attendance Code",
@@ -186,7 +233,51 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     );
   }
 
-  void storeAttendance() {
+  Future<void> checkDocument(String formattedDate) async {
+    try {
+      // Fetch the document from Firestore
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('classes')
+          .doc(widget.classCode) // Replace with your document ID
+          .collection("attendance")
+          .doc(formattedDate)
+          .get();
+
+      if (doc.exists) {
+        // Document exists, handle the data
+        print('Document Data: ${doc.data()}');
+      } else {
+        // Document does not exist, perform the operation
+        print('Document does not exist. Performing operation...');
+        // Example operation: Add a new document
+        // This increment the number of total classes by one
+        DocumentReference docRef =
+            db.collection('classes').doc(widget.classCode);
+        db.runTransaction((transaction) async {
+          DocumentSnapshot snapshot = await transaction.get(docRef);
+
+          if (!snapshot.exists) {
+            throw Exception("Document does not exist!");
+          }
+
+          int currentValue = snapshot["totalNumberOfClasses"];
+          int newValue = currentValue + 1;
+          transaction.update(docRef, {'totalNumberOfClasses': newValue});
+        }).then((_) {
+          print("Transaction successfully committed!");
+        }).catchError((error) {
+          print("Transaction failed: $error");
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            new SnackBar(content: Text("Data Successfully stored")));
+      }
+    } catch (e) {
+      print('Error fetching document: $e');
+    }
+  }
+
+  Future<void> storeAttendance() async {
     setState(() {
       finallyPresentStudentMap;
     });
@@ -196,6 +287,11 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     String formattedDate = DateFormat('dd-MM-yyyy').format(now) +
         "-" +
         attendanceCode.text.toString().trim();
+
+    //This function increases the number of classes
+    await checkDocument(formattedDate);
+
+
     // Adding number of present Students
     db
         .collection("classes")
@@ -204,7 +300,8 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
         .doc(formattedDate)
         .set({
       "date": formattedDate,
-      "totalPresentStudents": finallyPresentStudentMap.length.toString()
+      "totalPresentStudents": finallyPresentStudentMap.length.toString(),
+      "totalStudents": totalStudents
     });
 
     print("finallyPresentStudentMap");
@@ -233,7 +330,27 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
           .set({"date": formattedDate});
     }
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(new SnackBar(content: Text("Data Successfully stored")));
+
+
+    // // This increment the number of total classes by one
+    // DocumentReference docRef = db.collection('classes').doc(widget.classCode);
+    // db.runTransaction((transaction) async {
+    //   DocumentSnapshot snapshot = await transaction.get(docRef);
+    //
+    //   if (!snapshot.exists) {
+    //     throw Exception("Document does not exist!");
+    //   }
+    //
+    //   int currentValue = snapshot["totalNumberOfClasses"];
+    //   int newValue = currentValue + 1;
+    //   transaction.update(docRef, {'totalNumberOfClasses': newValue});
+    // }).then((_) {
+    //   print("Transaction successfully committed!");
+    // }).catchError((error) {
+    //   print("Transaction failed: $error");
+    // });
+    //
+    // ScaffoldMessenger.of(context)
+    //     .showSnackBar(new SnackBar(content: Text("Data Successfully stored")));
   }
 }

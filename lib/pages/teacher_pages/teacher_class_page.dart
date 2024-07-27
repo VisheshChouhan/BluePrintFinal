@@ -24,119 +24,163 @@ class _TeacherClassPageState extends State<TeacherClassPage> {
     return DefaultTabController(
         length: 3,
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: primaryColor,
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.white,
+            appBar: AppBar(
+              backgroundColor: primaryColor,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Text(
-                      widget.className.toUpperCase(),
+              title: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        widget.className.toUpperCase(),
+                        style: GoogleFonts.openSans(
+                            textStyle: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    Text(
+                      widget.classCode,
                       style: GoogleFonts.openSans(
-                          textStyle: TextStyle(color: Colors.white)),
+                          fontSize: 15,
+                          textStyle: TextStyle(color: Colors.white54)),
                     ),
-                  ),
-                  Text(
-                    widget.classCode,
-                    style: GoogleFonts.openSans(
-                        fontSize: 15,
-                        textStyle: TextStyle(color: Colors.white54)),
-                  ),
-                ]),
-            bottom: TabBar(
-              indicatorColor: blueColor,
-              labelColor: Colors.white,
-              // indicator: UnderlineTabIndicator(),
-              tabs: const [
-                Tab(
-                    icon: Icon(
-                      Icons.event,
-                      color: Colors.white,
-                    ),
-                    text: 'Mark Attendance'),
-                Tab(
-                    icon: Icon(
-                      Icons.calendar_month,
-                      color: Colors.white,
-                    ),
-                    text: 'View by Dates'),
-                Tab(
-                    icon: Icon(
-                      Icons.school,
-                      color: Colors.white,
-                    ),
-                    text: 'View Students'),
-              ],
-            ),
-          ),
-
-          body: TabBarView(
-            children: [
-              TeacherAttendancePage(
-                className: widget.className,
-                classCode: widget.classCode,
+                  ]),
+              bottom: TabBar(
+                indicatorColor: blueColor,
+                labelColor: Colors.white,
+                // indicator: UnderlineTabIndicator(),
+                tabs: const [
+                  Tab(
+                      icon: Icon(
+                        Icons.event,
+                        color: Colors.white,
+                      ),
+                      text: 'Mark Attendance'),
+                  Tab(
+                      icon: Icon(
+                        Icons.calendar_month,
+                        color: Colors.white,
+                      ),
+                      text: 'View by Dates'),
+                  Tab(
+                      icon: Icon(
+                        Icons.school,
+                        color: Colors.white,
+                      ),
+                      text: 'View Students'),
+                ],
               ),
-              AttendancyByDates(widget: widget,),
-              AttendanceByStudents(widget: widget,)
-
-            ],
-          )
-
-        ));
+            ),
+            body: TabBarView(
+              children: [
+                TeacherAttendancePage(
+                  className: widget.className,
+                  classCode: widget.classCode,
+                ),
+                AttendancyByDates(
+                  widget: widget,
+                ),
+                AttendanceByStudents(
+                  widget: widget,
+                )
+              ],
+            )));
   }
 }
-
 
 class AttendanceByStudents extends StatelessWidget {
   final TeacherClassPage widget;
   const AttendanceByStudents({super.key, required this.widget});
+  Future<DocumentSnapshot> fetchDocument() {
+    // Fetch a single document from Firestore
+    return FirebaseFirestore.instance
+        .collection('classes')
+        .doc(widget.classCode) // Replace with your document ID
+        .get();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Column(children: [
+      FutureBuilder<DocumentSnapshot>(
+        future: fetchDocument(), // Call the fetchDocument method
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            // return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            // return Center(child: Text('Document does not exist'));
+          }
+
+          final doc = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10,5,10,5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total Classes: ${doc['totalNumberOfClasses']}',
+                    style: GoogleFonts.openSans(
+                        fontSize: 15
+                    )),
+                // Add more fields as needed
+              ],
+            ),
+          );
+        },
+      ),
+
+
+      Container(
         child: Expanded(
-          child: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('classes')
-                .doc(widget.classCode)
-                .collection("students")
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
+      child: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('classes')
+            .doc(widget.classCode)
+            .collection("students")
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
-              // Access Firestore documents
-              final List<DocumentSnapshot> documents = snapshot.data!.docs;
+          // Access Firestore documents
+          final List<DocumentSnapshot> documents = snapshot.data!.docs;
 
-              return ListView.builder(
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  // Extract data from each document
-                  final Map<String, dynamic> data =
+          return ListView.builder(
+            itemCount: documents.length,
+            itemBuilder: (context, index) {
+              // Extract data from each document
+              final Map<String, dynamic> data =
                   documents[index].data() as Map<String, dynamic>;
 
-                  return StudentDetailTile(data: data, classCode: widget.classCode,);
-                },
+              return StudentDetailTile(
+                data: data,
+                classCode: widget.classCode,
               );
             },
-          ),
-        ));
+          );
+        },
+      ),
+    )
+    )]);
   }
 }
 
@@ -144,7 +188,8 @@ class StudentDetailTile extends StatelessWidget {
   final String classCode;
   const StudentDetailTile({
     super.key,
-    required this.data, required this.classCode,
+    required this.data,
+    required this.classCode,
   });
 
   final Map<String, dynamic> data;
@@ -157,10 +202,10 @@ class StudentDetailTile extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => CoordinatorStudentAttendancePage(
-                studentCode: data['studentCode'].toString().toUpperCase(),
-                studentName: data['studentName'].toString().toUpperCase(),
-                classCode:classCode ,
-              )));
+                    studentCode: data['studentCode'].toString().toUpperCase(),
+                    studentName: data['studentName'].toString().toUpperCase(),
+                    classCode: classCode,
+                  )));
         },
         child: Container(
           height: 55,
@@ -187,12 +232,12 @@ class StudentDetailTile extends StatelessWidget {
                   Text(
                     data['studentName'].toString().toUpperCase(),
                     style:
-                    GoogleFonts.openSans(fontSize: 15, color: Colors.white),
+                        GoogleFonts.openSans(fontSize: 15, color: Colors.white),
                   ),
                   Text(
                     data['studentCode'].toString().toUpperCase(),
                     style:
-                    GoogleFonts.openSans(fontSize: 15, color: Colors.white),
+                        GoogleFonts.openSans(fontSize: 15, color: Colors.white),
                   ),
                 ],
               )
@@ -212,10 +257,53 @@ class AttendancyByDates extends StatelessWidget {
 
   final TeacherClassPage widget;
 
+  Future<DocumentSnapshot> fetchDocument() {
+    // Fetch a single document from Firestore
+    return FirebaseFirestore.instance
+        .collection('classes')
+        .doc(widget.classCode) // Replace with your document ID
+        .get();
+  }
+
   @override
   Widget build(BuildContext context) {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        FutureBuilder<DocumentSnapshot>(
+          future: fetchDocument(), // Call the fetchDocument method
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              // return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              // return Center(child: Text('Document does not exist'));
+            }
+
+            final doc = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(10,5,10,5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total Classes: ${doc['totalNumberOfClasses']}',
+                      style: GoogleFonts.openSans(
+                        fontSize: 15
+                      )),
+                  // Add more fields as needed
+                ],
+              ),
+            );
+          },
+        ),
+        Divider(),
         SizedBox(
             height: 700,
             child: Column(
@@ -232,7 +320,7 @@ class AttendancyByDates extends StatelessWidget {
                           .snapshots(),
                       builder: (BuildContext context,
                           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
-                          snapshot) {
+                              snapshot) {
                         if (snapshot.hasData) {
                           return ListView.builder(
                               scrollDirection: Axis.vertical,
@@ -242,7 +330,7 @@ class AttendancyByDates extends StatelessWidget {
                                 return AttendanceDateTile(
                                   date: date["date"],
                                   presentStudents: date["totalPresentStudents"],
-                                  totalstudents: "6",
+                                  totalstudents: date["totalStudents"].toString()    ,
                                   classCode: widget.classCode,
                                   className: widget.className,
                                 );
