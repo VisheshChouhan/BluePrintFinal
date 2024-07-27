@@ -73,14 +73,14 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(widget.classCode.toUpperCase(), style: GoogleFonts.openSans(
-              color: Colors.white
-            ),),
-            Text(widget.className.toUpperCase(), style: GoogleFonts.openSans(
-                color: Colors.white,
-              fontSize: 15
-            ),),
-
+            Text(
+              widget.classCode.toUpperCase(),
+              style: GoogleFonts.openSans(color: Colors.white),
+            ),
+            Text(
+              widget.className.toUpperCase(),
+              style: GoogleFonts.openSans(color: Colors.white, fontSize: 15),
+            ),
           ],
         ),
       ),
@@ -160,26 +160,26 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
                 hintText: "Enter Unique Attendance Code",
                 obscureText: false),
             // Text(finallyPresentStudentMap.toString()),
-            SizedBox(height: 10,),
-            Center(child:
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-
-                ),
-                foregroundColor: Colors.white,
-                backgroundColor: MyColorThemeTheme.blueColor
-              ),
-                onPressed: () {
-                  if (attendanceCode.text.isNotEmpty) {
-                    storeAttendance();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content:
-                            Text("Please Enter a Unique Attendance Code")));
-                  }
-                },
-                child: const Text("Store Attendance")))
+            SizedBox(
+              height: 10,
+            ),
+            Center(
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(),
+                        foregroundColor: Colors.white,
+                        backgroundColor: MyColorThemeTheme.blueColor),
+                    onPressed: () {
+                      if (attendanceCode.text.isNotEmpty) {
+                        storeAttendance();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    "Please Enter a Unique Attendance Code")));
+                      }
+                    },
+                    child: const Text("Store Attendance")))
           ],
         ),
       ),

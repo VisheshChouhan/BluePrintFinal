@@ -310,11 +310,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
     List<dynamic> commandList = [];
     final tempStudentData = [];
     int templateId = 0;
-    if (tempClassCode == widget.classCode) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Finger Print Sensor is already setup."),
-      ));
-    } else {
+    {
       print("Inside Setup Class else");
       // String tempStudentCode = "FINGER1";
       // String tempStudentTemplate =
@@ -452,7 +448,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
         _isConnecting = false;
         _showConnectingDialog = false; // Dismiss dialog
       });
-      _showDialog('Error', exception.toString());
+      // _showDialog('Error', exception.toString());
+      _showDialog('Error',
+          "Unable to connect to the Bluetooth Device, Please try again...");
     }
   }
 
@@ -465,52 +463,51 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
         body: SingleChildScrollView(
       child: Stack(
         children: [
-
-
           Column(
             children: [
               Container(
-                padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                decoration: BoxDecoration(
-                  // color: primaryColor
-                ),
-                child: 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Text("All Bluetooth devices",
-                        style: GoogleFonts.openSans(
-                          // color: Colors.white,
+                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                decoration: const BoxDecoration(
+                    // color: primaryColor
+                    ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "All Bluetooth devices",
+                          style: GoogleFonts.openSans(
+                              // color: Colors.white,
 
+                              ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.refresh),
-                        onPressed: () {
-                          // Refresh action
-                          refreshBluetoothDevicesList();
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.expand_more),
-                        onPressed: () {
-                          // Expand action
-                          setState(() {
-                            isExpanded = !isExpanded;
-                          });
-                        },
-                      ),
-                    ],
-                  )
-                ],
-              ),),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.refresh),
+                          onPressed: () {
+                            // Refresh action
+                            refreshBluetoothDevicesList();
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.expand_more),
+                          onPressed: () {
+                            // Expand action
+                            setState(() {
+                              isExpanded = !isExpanded;
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
               // ElevatedButton(onPressed: (){refreshBluetoothDevicesList();}, child: Text("Refresh")),
               // ElevatedButton(
               //     onPressed: () {
@@ -520,7 +517,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
               //     },
               //     child: Text("Expand")),
               AnimatedContainer(
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 height: isExpanded ? 600.0 : 0.0,
                 child: Expanded(
                   child: ListView.builder(
@@ -530,17 +527,17 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                         title: Text(
                             _pairedDevices[index].name ?? 'Unknown Device'),
                         trailing: ElevatedButton(
-                          child: Text('Connect'),
                           onPressed: _isConnected || _isConnecting
                               ? null
                               : () => _connectDevice(_pairedDevices[index]),
+                          child: const Text('Connect'),
                         ),
                       );
                     },
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               // ElevatedButton(
@@ -555,104 +552,110 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    minimumSize: Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
-                    ), // Background color of the button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      minimumSize: const Size(10, 60),
+                      backgroundColor: Colors.blue, // Equal width, fixed height
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            8), // Optional: slightly rounded
+                      ), // Background color of the button
+                    ),
+                    onPressed: _isConnected && !sendingData
+                        ? () async {
+                            _connection?.output
+                                .add(Uint8List.fromList(utf8.encode("c")));
+                            await _connection?.output.allSent;
+                          }
+                        : null,
+                    child: Text(
+                      'Setup Device',
+                      style: GoogleFonts.openSans(color: Colors.white),
+                    ),
                   ),
-                  child: Text('Setup Device', style: GoogleFonts.openSans(
-                      color: Colors.white
-                  ),),
-                  onPressed: _isConnected && !sendingData
-                      ? () async {
 
-                    _connection?.output
-                        .add(Uint8List.fromList(utf8.encode("c")));
-                    await _connection?.output.allSent;
-                  }
-                      : null,
-                ),
-
-
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    minimumSize: Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
-                    ), // Background color of the button
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      minimumSize: const Size(10, 60),
+                      backgroundColor: Colors.blue, // Equal width, fixed height
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            8), // Optional: slightly rounded
+                      ), // Background color of the button
+                    ),
+                    onPressed: _isConnected && !sendingData
+                        ? () async {
+                            _connection?.output
+                                .add(Uint8List.fromList(utf8.encode("s")));
+                            await _connection?.output.allSent;
+                          }
+                        : null,
+                    child: Text(
+                      'Fetch Attendance\n Data',
+                      style: GoogleFonts.openSans(color: Colors.white),
+                    ),
                   ),
-                  child: Text('Fetch Attendance\n Data', style: GoogleFonts.openSans(
-                      color: Colors.white
-                  ),),
-                  onPressed: _isConnected && !sendingData
-                      ? () async {
-                    _connection?.output
-                        .add(Uint8List.fromList(utf8.encode("s")));
-                    await _connection?.output.allSent;
-                  }
-                      : null,
-                ),
-                // Conditionally show Button 2 and Button 3 based on showOptionalButtonsif (widget.showOptionalButtons) ...[
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    minimumSize: const Size(10, 60), backgroundColor: Colors.blue, // Equal width, fixed height
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8), // Optional: slightly rounded
-                    ), // Background color of the button
+                  // Conditionally show Button 2 and Button 3 based on showOptionalButtonsif (widget.showOptionalButtons) ...[
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      minimumSize: const Size(10, 60),
+                      backgroundColor: Colors.blue, // Equal width, fixed height
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            8), // Optional: slightly rounded
+                      ), // Background color of the button
+                    ),
+                    onPressed: _isConnected && !sendingData
+                        ? () {
+                            _connection?.output
+                                .add(Uint8List.fromList(utf8.encode("r")));
+                          }
+                        : null,
+                    child: Text(
+                      'Reset Attendance \nData',
+                      style: GoogleFonts.openSans(color: Colors.white),
+                    ),
                   ),
-                  child: Text('Reset Attendance \nData', style: GoogleFonts.openSans(
-                    color: Colors.white
-                  ),),
-                  onPressed: _isConnected && !sendingData
-                      ? () {
-                    _connection?.output
-                        .add(Uint8List.fromList(utf8.encode("r")));
-                  }
-                      : null,
-                ),
-              ],
+                ],
               ),
-              SizedBox(height: 10,),
+              const SizedBox(
+                height: 10,
+              ),
               // Text(
               //   espOutput,
               // ),
-
-
-
             ],
           ),
           // Show a modal dialog with a progress indicator while connecting
-          if (_showConnectingDialog) ...[
-            const Opacity(
-              opacity: 0.6,
-              child: ModalBarrier(
-                dismissible: false,
-                color: Colors.grey,
+          // if (_showConnectingDialog) ...[
+          //   const Opacity(
+          //     opacity: 0.6,
+          //     child: ModalBarrier(
+          //       dismissible: false,
+          //       color: Colors.grey,
+          //     ),
+          //   ),
+          //   const Center(
+          //     child: CircularProgressIndicator(),
+          //   ),
+          // ],
+          if (sendingData)
+            const SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ],
               ),
             ),
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
-          ],
-          if (sendingData)  const SafeArea(child:
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-
-              Center(child:CircularProgressIndicator(),),
-
-            ],
-          ),),
         ],
       ),
-    )
-    );
+    ));
   }
 }

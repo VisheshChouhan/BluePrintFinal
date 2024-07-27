@@ -338,11 +338,14 @@ class _ConnectPageState extends State<ConnectPage> {
 
       _showDialog('Connected', 'Device connected successfully!');
     } catch (exception) {
+      print("exeption:" + exception.toString());
       setState(() {
         _isConnecting = false;
         _showConnectingDialog = false; // Dismiss dialog
       });
-      _showDialog('Error', exception.toString());
+      // _showDialog('Error', exception.toString());
+      // _showDialog('Error1', "Unable to connect to Bluetooth Device. Please try again..");
+
     }
   }
 
@@ -434,10 +437,10 @@ class _ConnectPageState extends State<ConnectPage> {
           // Show a modal dialog with a progress indicator while connecting
           if (_showConnectingDialog) ...[
             const Opacity(
-              opacity: 0.6,
+              opacity: 1,
               child: ModalBarrier(
                 dismissible: false,
-                color: Colors.grey,
+                color: Colors.black,
               ),
             ),
             const Center(

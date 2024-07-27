@@ -1,3 +1,4 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../assets/my_color_theme.dart';
 import '../../models/class_tile.dart';
 
 class ClassCollectionPage extends StatefulWidget {
@@ -22,14 +24,14 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
   String currentUserId = FirebaseAuth.instance.currentUser?.uid ?? "";
 
   // Method to Create New class
-  void createNewClass() {
-    checkExistingClass();
+  void createNewClass(String newClassCode) {
+    checkExistingClass(newClassCode);
   }
 
-  Future checkExistingClass() async {
+  Future checkExistingClass(String newClassCode) async {
     var a = await db
         .collection('coordinator')
-        .doc(_classCodeController.text.toString())
+        .doc(newClassCode)
         .get();
 
     if (a.exists) {
@@ -44,8 +46,8 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
     if (!a.exists) {
       print('Not exists');
 
-      String classCode = _classCodeController.text.toString().trim();
-      String className = _classNameController.text.toString().trim();
+      String classCode = newClassCode;
+      String className = _classNameController.text.toString().trim().toUpperCase();
 
       if (_classCodeController.text.isNotEmpty &&
           _classNameController.text.isNotEmpty) {
@@ -77,7 +79,26 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
     Color blueColor = const Color.fromRGBO(0, 152, 206, 1.0);
     // Form key for validation
     final _formKey = GlobalKey<FormState>();
-    // Controllers for text fields
+    // Controllers for text
+
+    String? selectedDepartmentCode = 'CO'; // Default country code
+    final List<String> subjectCodesList = [
+      "CO",
+      "PY",
+      "IP",
+      "ME",
+      "CE",
+      "EE",
+      "EC",
+      "EI",
+      "CH",
+      "BM",
+      "MA",
+      "MBA"
+      // Add more subject codes as needed
+    ];
+
+
 
     // Show dialog with the form
     showDialog(
@@ -94,26 +115,68 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min, // To make the dialog box smaller
               children: <Widget>[
-                TextFormField(
-                  controller: _classCodeController,
-                  decoration: InputDecoration(
-                    labelText: 'Enter Class Code',
-                    labelStyle:
-                        GoogleFonts.openSans(fontSize: 15, color: Colors.blue),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: blueColor,
+
+                Row(
+                  children: [
+                    Container(
+                      width: 95, // Adjust the width as needed
+                      child: DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: 'Department \nCode',
+                          labelStyle: GoogleFonts.openSans(fontSize: 15, color: Colors.blue),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: MyColorThemeTheme.blueColor,
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        value: selectedDepartmentCode,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedDepartmentCode = newValue;
+                          });
+                        },
+                        items: subjectCodesList.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.blue,
+
+                    const SizedBox(width: 5.0),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _classCodeController,
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          labelText: 'Enter Class Code',
+                          labelStyle:
+                          GoogleFonts.openSans(fontSize: 15, color: Colors.blue),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: MyColorThemeTheme.blueColor,
+                            ),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
                 const SizedBox(
                   height: 20,
+                  width: 600,
                 ),
                 TextFormField(
                   controller: _classNameController,
@@ -151,9 +214,11 @@ class _ClassCollectionPageState extends State<ClassCollectionPage> {
                 style: GoogleFonts.openSans(color: Colors.white),
               ),
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
+                if (_formKey.currentState!.validate() && _classCodeController.text.isNotEmpty && _classNameController.text.isNotEmpty) {
                   // If the form is valid, proceed to handle the data
-                  createNewClass();
+                  String newClassCode = selectedDepartmentCode.toString().toUpperCase() + _classCodeController.text.toString().toUpperCase();
+                  print("new Class Code"+newClassCode);
+                  createNewClass(newClassCode);
 
                   Navigator.of(context).pop(); // Close the dialog
                 }

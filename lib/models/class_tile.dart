@@ -46,32 +46,37 @@ class ClassTile extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 5),
                   child: Container(
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(0),
                     decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(10)),
-                    width: double.infinity,
-                    child: Expanded(
+                    // width: double.infinity,
+                    // child: Expanded(
                       child: Row(
                         children: [
                           Container(width: 10,
                           height:60,
                           color: blueColor,),
-                          SizedBox(width: 20,
+                          const SizedBox(width: 20,
                           height: 10,),
                           //Picture of the subject
+                          Expanded(child:
                           Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(courseCode.toUpperCase(),
-                                  style: GoogleFonts.abel(
-                                    textStyle: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 30,
-                                        color: Colors.white
-                                    ),
-                                  )),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child:Text(courseCode.toUpperCase(),
+                                    style: GoogleFonts.abel(
+                                      textStyle: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
+                                          color: Colors.white
+                                      ),
+                                    )),
+                              ),
+
 
                               //Subject Name
                               SingleChildScrollView(
@@ -85,13 +90,13 @@ class ClassTile extends StatelessWidget {
                                     ),
                                   )),)
                             ],
-                          ),
+                          ),),
                         ],
                       ),
                     ),
                   ),
                 ),
-              ),
+              // ),
               //const SizedBox(height: 10,)
             ],
           ),
