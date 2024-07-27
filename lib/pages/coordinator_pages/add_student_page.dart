@@ -13,7 +13,9 @@ import 'package:google_fonts/google_fonts.dart';
 class AddStudentPage extends StatefulWidget {
   final String classCode;
   final String className;
-  const AddStudentPage({Key? key, required this.classCode, required this.className}) : super(key: key);
+  const AddStudentPage(
+      {Key? key, required this.classCode, required this.className})
+      : super(key: key);
 
   @override
   State<AddStudentPage> createState() => _AddStudentPageState();
@@ -24,6 +26,52 @@ class _AddStudentPageState extends State<AddStudentPage> {
   List<List<dynamic>> _UnableToAddStudentList = [];
   String? filePath;
   TextEditingController _studentCodeController = TextEditingController();
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
+  Future<void> checkDocument(String studentUID) async {
+    try {
+      // Fetch the document from Firestore
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('classes')
+          .doc(widget.classCode) // Replace with your document ID
+          .collection("students")
+          .doc(studentUID)
+          .get();
+
+      if (doc.exists) {
+        // Document exists, handle the data
+        print('Document Data: ${doc.data()}');
+      } else {
+        // Document does not exist, perform the operation
+        print('Document does not exist. Performing operation...');
+        // Example operation: Add a new document
+        // This increment the number of total classes by one
+        DocumentReference docRef =
+        db.collection('classes').doc(widget.classCode);
+        db.runTransaction((transaction) async {
+          DocumentSnapshot snapshot = await transaction.get(docRef);
+
+          if (!snapshot.exists) {
+            throw Exception("Document does not exist!");
+          }
+
+          int currentValue = snapshot["totalStudents"];
+          int newValue = currentValue + 1;
+          transaction.update(docRef, {'totalStudents': newValue});
+        }).then((_) {
+          print("Transaction successfully committed!");
+        }).catchError((error) {
+          print("Transaction failed: $error");
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            new SnackBar(content: Text("Data Successfully stored")));
+      }
+    } catch (e) {
+      print('Error fetching document: $e');
+    }
+  }
+
 
   Future<bool> addStudent(String StudentUID) async {
     StudentUID = StudentUID.toUpperCase().toString().trim();
@@ -31,9 +79,10 @@ class _AddStudentPageState extends State<AddStudentPage> {
     final docRef = db.collection("students").doc(StudentUID);
     bool result = true;
 
-    await docRef.get().then((DocumentSnapshot doc) {
-
+    await docRef.get().then((DocumentSnapshot doc) async {
       if (doc.exists) {
+
+        await checkDocument(StudentUID);
         final data = doc.data() as Map<String, dynamic>;
         db
             .collection("classes")
@@ -43,7 +92,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
             .set({
           "studentCode": StudentUID,
           "studentName": data["studentName"],
-
+          "totalDaysPresent": 0
         });
 
         db
@@ -54,12 +103,12 @@ class _AddStudentPageState extends State<AddStudentPage> {
             .set({
           "classCode": widget.classCode,
           "className": widget.className,
+          "totalDaysPresent":0
         });
 
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Student added Succesfully"),
         ));
-
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("The student $StudentUID doesn't exists."),
@@ -79,7 +128,15 @@ class _AddStudentPageState extends State<AddStudentPage> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: MyColorThemeTheme.visheshPrimaryColor,
-          leading: IconButton(icon: Icon(Icons.arrow_back, color: Colors.white,),onPressed: (){Navigator.pop(context);},),
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: const Text("Add Students",
               style: TextStyle(
                 color: Colors.white,
@@ -98,8 +155,18 @@ class _AddStudentPageState extends State<AddStudentPage> {
                 label: Text("Enter Student Unique Code"),
               ),
             ),
-            ElevatedButton(onPressed:() => addStudent(_studentCodeController.text), child: Text("Add Student")),
-            Divider(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: MyColorThemeTheme.visheshPrimaryColor,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero
+                )
+              ),
+                onPressed: () => addStudent(_studentCodeController.text),
+                child: Text("Add Student", style: GoogleFonts.openSans(
+                  color: Colors.white
+                ),)),
+            const Divider(
               color: Colors.black,
             ),
             Container(
@@ -107,6 +174,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                     backgroundColor: MyColorThemeTheme.visheshPrimaryColor),
                 onPressed: () {
                   showDialog(
@@ -195,8 +263,8 @@ class _AddStudentPageState extends State<AddStudentPage> {
                 },
                 child: Text("Select File",
                     style: GoogleFonts.openSans(
-                      textStyle: const TextStyle(
-                          fontSize: 30, color: Colors.white),
+                      textStyle:
+                          const TextStyle(fontSize: 30, color: Colors.white),
                     )),
               ),
             ),
@@ -205,13 +273,14 @@ class _AddStudentPageState extends State<AddStudentPage> {
             //Unable to Enroll Student List
             Expanded(
               child: ListView.builder(
-                itemCount: _UnableToAddStudentList .length,
+                itemCount: _UnableToAddStudentList.length,
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
                 itemBuilder: (_, index) {
                   return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero, // Set the border radius to zero
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.zero, // Set the border radius to zero
                     ),
                     margin: const EdgeInsets.all(3),
                     color: index == 0 ? Colors.blue : Colors.white,
@@ -228,7 +297,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                             child: Flexible(
                               child: RichText(
                                 overflow: TextOverflow.ellipsis,
-                                strutStyle: StrutStyle(fontSize: 12.0),
+                                strutStyle: const StrutStyle(fontSize: 12.0),
                                 text: TextSpan(
                                     style: TextStyle(
                                         fontSize: index == 0 ? 18 : 15,
@@ -238,7 +307,8 @@ class _AddStudentPageState extends State<AddStudentPage> {
                                         color: index == 0
                                             ? Colors.white
                                             : Colors.black),
-                                    text: _UnableToAddStudentList[index][0].toString()),
+                                    text: _UnableToAddStudentList[index][0]
+                                        .toString()),
                               ),
                             ),
                             /*Text(_data[index][0].toString(),textAlign: TextAlign.center,
@@ -247,7 +317,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                           const SizedBox(
                             width: 10,
                           ),
-                          VerticalDivider(
+                          const VerticalDivider(
                             color: MyColorThemeTheme.visheshPrimaryColor,
                             thickness: 2,
                           ),
@@ -265,7 +335,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                                       ? FontWeight.bold
                                       : FontWeight.normal,
                                   color:
-                                  index == 0 ? Colors.white : Colors.black),
+                                      index == 0 ? Colors.white : Colors.black),
                             ),
                           )
                         ],
@@ -283,8 +353,9 @@ class _AddStudentPageState extends State<AddStudentPage> {
                 shrinkWrap: true,
                 itemBuilder: (_, index) {
                   return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero, // Set the border radius to zero
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.zero, // Set the border radius to zero
                     ),
                     margin: const EdgeInsets.all(3),
                     color: index == 0 ? Colors.blue : Colors.white,
@@ -301,7 +372,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                             child: Flexible(
                               child: RichText(
                                 overflow: TextOverflow.ellipsis,
-                                strutStyle: StrutStyle(fontSize: 12.0),
+                                strutStyle: const StrutStyle(fontSize: 12.0),
                                 text: TextSpan(
                                     style: TextStyle(
                                         fontSize: index == 0 ? 18 : 15,
@@ -320,7 +391,7 @@ class _AddStudentPageState extends State<AddStudentPage> {
                           const SizedBox(
                             width: 2,
                           ),
-                           VerticalDivider(
+                          VerticalDivider(
                             color: MyColorThemeTheme.visheshPrimaryColor,
                             thickness: 2,
                           ),
@@ -352,35 +423,38 @@ class _AddStudentPageState extends State<AddStudentPage> {
               child: ElevatedButton(
                 onPressed: () async {
                   if (_data.isNotEmpty) {
-                    List<List<dynamic>> tempUnableToEnrollList = [["Student UID", "Student Name"],];
+                    List<List<dynamic>> tempUnableToEnrollList = [
+                      ["Student UID", "Student Name"],
+                    ];
 
-                    for (var element in _data.skip(1)) // for skip first value bcs its contain name
-                        {
-                          bool result = await addStudent(element[0]);
-                          print(result);
-                          if (result == false){
-                            tempUnableToEnrollList.add(element);
-                            setState(() {
-                              _UnableToAddStudentList = tempUnableToEnrollList;
-                            });
-                          }
+                    for (var element in _data
+                        .skip(1)) // for skip first value bcs its contain name
+                    {
+                      bool result = await addStudent(element[0]);
+                      print(result);
+                      if (result == false) {
+                        tempUnableToEnrollList.add(element);
+                        setState(() {
+                          _UnableToAddStudentList = tempUnableToEnrollList;
+                        });
+                      }
                     }
-                  } else{
+                  } else {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Please select a file."),
                     ));
-
-
                   }
-
-
-                }  ,
-                style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.blue),
-
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  foregroundColor: MyColorThemeTheme.blueColor,
+                  backgroundColor: MyColorThemeTheme.blueColor
                 ),
-                child:  Text("Enroll Students",
-                  style: GoogleFonts.abel( textStyle: TextStyle(fontSize: 20),color: Colors.white) ,),
+                child: Text(
+                  "Enroll Students",
+                  style: GoogleFonts.abel(
+                      textStyle: TextStyle(fontSize: 20), color: Colors.white),
+                ),
               ),
             ),
           ],

@@ -17,6 +17,26 @@ class StudentAttendancePage extends StatefulWidget {
 class _StudentAttendancePageState extends State<StudentAttendancePage> {
   Color primaryColor = const Color.fromRGBO(1, 94, 127, 1);
   Color blueColor = const Color.fromRGBO(0, 152, 206, 1.0);
+
+  Future<DocumentSnapshot> fetchClassData() {
+    // Fetch a single document from Firestore
+    return FirebaseFirestore.instance
+        .collection('classes')
+        .doc(widget.classCode) // Replace with your document ID
+        .get();
+  }
+
+  Future<DocumentSnapshot> fetchStudentData() {
+    // Fetch a single document from Firestore
+    return FirebaseFirestore.instance
+        .collection('classes')
+        .doc(widget.classCode)
+    .collection("students")
+    .doc(widget.studentCode)// Replace with your document ID
+        .get();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,38 +64,114 @@ class _StudentAttendancePageState extends State<StudentAttendancePage> {
                     style: GoogleFonts.openSans(
                         fontSize: 15, color: Colors.white70)),
               ])),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection('students')
-            .doc(widget.studentCode)
-            .collection("classes")
-            .doc(widget.classCode)
-            .collection("attendance")
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
+      body:
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+        FutureBuilder<DocumentSnapshot>(
+          future: fetchClassData(), // Call the fetchDocument method
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+            if (snapshot.hasError) {
+              // return Center(child: Text('Error: ${snapshot.error}'));
+            }
 
-          // Access Firestore documents
-          final List<DocumentSnapshot> documents = snapshot.data!.docs;
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              // return Center(child: Text('Document does not exist'));
+            }
 
-          return ListView.builder(
-            itemCount: documents.length,
-            itemBuilder: (context, index) {
-              // Extract data from each document
-              final Map<String, dynamic> data =
-              documents[index].data() as Map<String, dynamic>;
+            final doc = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(10,5,10,5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total Students: ${doc['totalNumberOfClasses']}',
+                      style: GoogleFonts.openSans(
+                          fontSize: 15
+                      )),
+                  // Add more fields as needed
+                ],
+              ),
+            );
+          },
+        ),
 
-              return DateTile(data: data);
-            },
-          );
-        },
-      ),
+        FutureBuilder<DocumentSnapshot>(
+          future: fetchStudentData(), // Call the fetchDocument method
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              // return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              // return Center(child: Text('Document does not exist'));
+            }
+
+            final doc = snapshot.data!;
+            // totalNumberOfClasses = doc['totalNumberOfClasses'];
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(10,5,10,5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total Classes Attended: ${doc['totalDaysPresent']}',
+                      style: GoogleFonts.openSans(
+                          fontSize: 15
+                      )),
+                  // Add more fields as needed
+                ],
+              ),
+            );
+          },
+        ),
+        Divider(),
+        Expanded(child:
+        StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('students')
+              .doc(widget.studentCode)
+              .collection("classes")
+              .doc(widget.classCode)
+              .collection("attendance")
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            // Access Firestore documents
+            final List<DocumentSnapshot> documents = snapshot.data!.docs;
+
+            return ListView.builder(
+              itemCount: documents.length,
+              itemBuilder: (context, index) {
+                // Extract data from each document
+                final Map<String, dynamic> data =
+                documents[index].data() as Map<String, dynamic>;
+
+                return DateTile(data: data);
+              },
+            );
+          },
+        ),
+
+
+
+        )
+      ],)
+
     );
   }
 }

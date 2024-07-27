@@ -100,7 +100,7 @@ class _TeacherClassPageState extends State<TeacherClassPage> {
 class AttendanceByStudents extends StatelessWidget {
   final TeacherClassPage widget;
   const AttendanceByStudents({super.key, required this.widget});
-  Future<DocumentSnapshot> fetchDocument() {
+  Future<DocumentSnapshot> fetchClassData() {
     // Fetch a single document from Firestore
     return FirebaseFirestore.instance
         .collection('classes')
@@ -108,11 +108,17 @@ class AttendanceByStudents extends StatelessWidget {
         .get();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+
+    int totalNumberOfClasses = 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
       FutureBuilder<DocumentSnapshot>(
-        future: fetchDocument(), // Call the fetchDocument method
+        future: fetchClassData(), // Call the fetchDocument method
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -132,7 +138,7 @@ class AttendanceByStudents extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Total Classes: ${doc['totalNumberOfClasses']}',
+                Text('Total Students: ${doc['totalStudents']}',
                     style: GoogleFonts.openSans(
                         fontSize: 15
                     )),
@@ -142,6 +148,40 @@ class AttendanceByStudents extends StatelessWidget {
           );
         },
       ),
+
+      FutureBuilder<DocumentSnapshot>(
+        future: fetchClassData(), // Call the fetchDocument method
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            // return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            // return Center(child: Text('Document does not exist'));
+          }
+
+          final doc = snapshot.data!;
+          totalNumberOfClasses = doc['totalNumberOfClasses'];
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10,5,10,5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total Classes: $totalNumberOfClasses',
+                    style: GoogleFonts.openSans(
+                        fontSize: 15
+                    )),
+                // Add more fields as needed
+              ],
+            ),
+          );
+        },
+      ),
+      const Divider(),
 
 
       Container(
@@ -174,6 +214,8 @@ class AttendanceByStudents extends StatelessWidget {
               return StudentDetailTile(
                 data: data,
                 classCode: widget.classCode,
+                totalNumberOfClasses: totalNumberOfClasses
+
               );
             },
           );
@@ -186,10 +228,11 @@ class AttendanceByStudents extends StatelessWidget {
 
 class StudentDetailTile extends StatelessWidget {
   final String classCode;
+  final int totalNumberOfClasses;
   const StudentDetailTile({
     super.key,
     required this.data,
-    required this.classCode,
+    required this.classCode, required this.totalNumberOfClasses,
   });
 
   final Map<String, dynamic> data;
@@ -205,6 +248,8 @@ class StudentDetailTile extends StatelessWidget {
                     studentCode: data['studentCode'].toString().toUpperCase(),
                     studentName: data['studentName'].toString().toUpperCase(),
                     classCode: classCode,
+                totalClasses: totalNumberOfClasses.toString(),
+                noOfClassesAttended: data['totalDaysPresent'].toString().toUpperCase(),
                   )));
         },
         child: Container(
@@ -225,22 +270,42 @@ class StudentDetailTile extends StatelessWidget {
               SizedBox(
                 width: 15,
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(child:
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    data['studentName'].toString().toUpperCase(),
-                    style:
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data['studentName'].toString().toUpperCase(),
+                        style:
                         GoogleFonts.openSans(fontSize: 15, color: Colors.white),
+                      ),
+                      Text(
+                        data['studentCode'].toString().toUpperCase(),
+                        style:
+                        GoogleFonts.openSans(fontSize: 15, color: Colors.white),
+                      ),
+
+                    ],
+
                   ),
                   Text(
-                    data['studentCode'].toString().toUpperCase(),
+                    "${data['totalDaysPresent'].toString().toUpperCase()}",
                     style:
-                        GoogleFonts.openSans(fontSize: 15, color: Colors.white),
+                    GoogleFonts.openSans(fontSize: 15, color: Colors.white),
                   ),
+
+
+
                 ],
-              )
+
+              ),)
+
+
+
             ],
           ),
 

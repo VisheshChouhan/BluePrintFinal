@@ -207,7 +207,7 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
                 hintText: "Enter Unique Attendance Code",
                 obscureText: false),
             // Text(finallyPresentStudentMap.toString()),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Center(
@@ -233,7 +233,7 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     );
   }
 
-  Future<void> checkDocument(String formattedDate) async {
+  Future<void> checkDateExistAndIncrement(String formattedDate) async {
     try {
       // Fetch the document from Firestore
       DocumentSnapshot doc = await FirebaseFirestore.instance
@@ -277,6 +277,42 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     }
   }
 
+
+  Future<void> checkStudentExistAndIncrement(String studentUID) async {
+    try {
+
+        // Document does not exist, perform the operation
+        print('Document does not exist. Performing operation...');
+        // Example operation: Add a new document
+        // This increment the number of total classes by one
+        DocumentReference docRef =
+        db.collection('classes').doc(widget.classCode).collection("students").doc(studentUID);
+        db.runTransaction((transaction) async {
+          DocumentSnapshot snapshot = await transaction.get(docRef);
+
+          if (!snapshot.exists) {
+            throw Exception("Document does not exist!");
+          }
+
+          int currentValue = snapshot["totalDaysPresent"];
+          int newValue = currentValue + 1;
+          transaction.update(docRef, {'totalDaysPresent': newValue});
+        }).then((_) {
+          print("Transaction successfully committed!");
+        }).catchError((error) {
+          print("Transaction failed: $error");
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+            new SnackBar(content: Text("Data Successfully stored")));
+
+    } catch (e) {
+      print('Error fetching document: $e');
+    }
+  }
+
+
+
   Future<void> storeAttendance() async {
     setState(() {
       finallyPresentStudentMap;
@@ -284,13 +320,10 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     // Get the current date
     DateTime now = DateTime.now();
     // Format the date
-    String formattedDate = DateFormat('dd-MM-yyyy').format(now) +
-        "-" +
-        attendanceCode.text.toString().trim();
+    String formattedDate = "${DateFormat('dd-MM-yyyy').format(now)}-${attendanceCode.text.toString().trim()}";
 
     //This function increases the number of classes
-    await checkDocument(formattedDate);
-
+    await checkDateExistAndIncrement(formattedDate);
 
     // Adding number of present Students
     db
@@ -307,27 +340,29 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
     print("finallyPresentStudentMap");
     print(finallyPresentStudentMap.toString());
     for (int i = 0; i < finallyPresentStudentMap.length; i++) {
-      String tempStudentCode =
-          finallyPresentStudentMap.elementAt(i)["studentCode"];
-      String tempStudentName =
-          finallyPresentStudentMap.elementAt(i)["studentName"];
-      db
-          .collection("classes")
-          .doc(widget.classCode)
-          .collection("attendance")
-          .doc(formattedDate)
-          .collection("presentStudents")
-          .doc(tempStudentCode)
-          .set(finallyPresentStudentMap.elementAt(i).getInnerMap());
+        String tempStudentCode =
+            finallyPresentStudentMap.elementAt(i)["studentCode"];
+        String tempStudentName =
+            finallyPresentStudentMap.elementAt(i)["studentName"];
 
-      db
-          .collection("students")
-          .doc(tempStudentCode)
-          .collection("classes")
-          .doc(widget.classCode)
-          .collection("attendance")
-          .doc(formattedDate)
-          .set({"date": formattedDate});
+        await checkStudentExistAndIncrement(tempStudentCode);
+        db
+            .collection("classes")
+            .doc(widget.classCode)
+            .collection("attendance")
+            .doc(formattedDate)
+            .collection("presentStudents")
+            .doc(tempStudentCode)
+            .set(finallyPresentStudentMap.elementAt(i).getInnerMap());
+
+        db
+            .collection("students")
+            .doc(tempStudentCode)
+            .collection("classes")
+            .doc(widget.classCode)
+            .collection("attendance")
+            .doc(formattedDate)
+            .set({"date": formattedDate});
     }
 
 

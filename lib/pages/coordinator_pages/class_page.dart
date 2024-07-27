@@ -285,10 +285,86 @@ class _ClassPageState extends State<ClassPage> {
 class AttendanceByStudents extends StatelessWidget {
   final ClassPage widget;
   const AttendanceByStudents({super.key, required this.widget});
+  Future<DocumentSnapshot> fetchClassData() {
+    // Fetch a single document from Firestore
+    return FirebaseFirestore.instance
+        .collection('classes')
+        .doc(widget.classCode) // Replace with your document ID
+        .get();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    int totalNumberOfClasses = 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+      FutureBuilder<DocumentSnapshot>(
+        future: fetchClassData(), // Call the fetchDocument method
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            // return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            // return Center(child: Text('Document does not exist'));
+          }
+
+          final doc = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10,5,10,5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total Students: ${doc['totalStudents']}',
+                    style: GoogleFonts.openSans(
+                        fontSize: 15
+                    )),
+                // Add more fields as needed
+              ],
+            ),
+          );
+        },
+      ),
+
+      FutureBuilder<DocumentSnapshot>(
+        future: fetchClassData(), // Call the fetchDocument method
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            // return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            // return Center(child: Text('Document does not exist'));
+          }
+
+          final doc = snapshot.data!;
+          totalNumberOfClasses = doc['totalNumberOfClasses'];
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10,5,10,5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total Classes: $totalNumberOfClasses',
+                    style: GoogleFonts.openSans(
+                        fontSize: 15
+                    )),
+                // Add more fields as needed
+              ],
+            ),
+          );
+        },
+      ),
+      Divider(),
+      Container(
         child: Expanded(
       child: StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -318,21 +394,24 @@ class AttendanceByStudents extends StatelessWidget {
               return StudentDetailTile(
                 data: data,
                 classCode: widget.classCode,
+                totalNumberOfClasses: totalNumberOfClasses,
               );
             },
           );
         },
       ),
-    ));
+    )
+    )]);
   }
 }
 
 class StudentDetailTile extends StatelessWidget {
   final String classCode;
+  final int totalNumberOfClasses;
   const StudentDetailTile({
     super.key,
     required this.data,
-    required this.classCode,
+    required this.classCode, required this.totalNumberOfClasses,
   });
 
   final Map<String, dynamic> data;
@@ -348,6 +427,8 @@ class StudentDetailTile extends StatelessWidget {
                     studentCode: data['studentCode'].toString().toUpperCase(),
                     studentName: data['studentName'].toString().toUpperCase(),
                     classCode: classCode,
+                  totalClasses: totalNumberOfClasses.toString(),
+                  noOfClassesAttended: data['totalDaysPresent'].toString().toUpperCase()
                   )));
         },
         child: Container(
@@ -368,6 +449,9 @@ class StudentDetailTile extends StatelessWidget {
               SizedBox(
                 width: 15,
               ),
+              Expanded(child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,7 +467,14 @@ class StudentDetailTile extends StatelessWidget {
                         GoogleFonts.openSans(fontSize: 15, color: Colors.white),
                   ),
                 ],
-              )
+              ),
+              Text(
+                "Attended: ${data['totalDaysPresent'].toString().toUpperCase()}",
+                style:
+                GoogleFonts.openSans(fontSize: 15, color: Colors.white),
+              ),
+                ]
+              ),),
             ],
           ),
 
@@ -400,11 +491,53 @@ class AttendancyByDates extends StatelessWidget {
 
   final ClassPage widget;
 
+  Future<DocumentSnapshot> fetchDocument() {
+    // Fetch a single document from Firestore
+    return FirebaseFirestore.instance
+        .collection('classes')
+        .doc(widget.classCode) // Replace with your document ID
+        .get();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+
       children: [
+        FutureBuilder<DocumentSnapshot>(
+          future: fetchDocument(), // Call the fetchDocument method
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              // return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              // return Center(child: Text('Document does not exist'));
+            }
+
+            final doc = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(10,5,10,5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total Classes: ${doc['totalNumberOfClasses']}',
+                      style: GoogleFonts.openSans(
+                          fontSize: 15
+                      )),
+                  // Add more fields as needed
+                ],
+              ),
+            );
+          },
+        ),
+        Divider(),
         SizedBox(
             height: 700,
             child: Column(
@@ -431,7 +564,7 @@ class AttendancyByDates extends StatelessWidget {
                                 return AttendanceDateTile(
                                   date: date["date"],
                                   presentStudents: date["totalPresentStudents"],
-                                  totalstudents: "6",
+                                  totalstudents: date["totalStudents"].toString(),
                                   classCode: widget.classCode,
                                   className: widget.className,
                                 );

@@ -7,12 +7,14 @@ class CoordinatorStudentAttendancePage extends StatefulWidget {
   final String studentCode;
   final String studentName;
   final String classCode;
+  final String totalClasses;
+  final String noOfClassesAttended;
 
   const CoordinatorStudentAttendancePage(
       {super.key,
       required this.studentCode,
       required this.studentName,
-      required this.classCode});
+      required this.classCode, required this.totalClasses, required this.noOfClassesAttended});
 
   @override
   State<CoordinatorStudentAttendancePage> createState() =>
@@ -50,7 +52,22 @@ class _CoordinatorStudentAttendancePageState
                     style: GoogleFonts.openSans(
                         fontSize: 15, color: Colors.white70)),
               ])),
-      body: StreamBuilder(
+      body:
+      Column(crossAxisAlignment: CrossAxisAlignment.start,
+          children:[
+
+        Text('Total Classes: ${widget.totalClasses}',
+            style: GoogleFonts.openSans(
+                fontSize: 15
+            )),
+        Text('Total Classes Attended: ${widget.noOfClassesAttended}',
+            style: GoogleFonts.openSans(
+                fontSize: 15
+            )),
+      Divider(),
+
+      Expanded(child:
+      StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('students')
             .doc(widget.studentCode)
@@ -81,7 +98,8 @@ class _CoordinatorStudentAttendancePageState
             },
           );
         },
-      ),
+      ),),
+        ])
     );
   }
 }

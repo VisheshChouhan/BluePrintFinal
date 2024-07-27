@@ -55,6 +55,15 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                 leading: Icon(Icons.home),
                 title: Text('Home'),
                 onTap: () {
+                  Navigator.pop(context);
+
+                },
+              ),
+              Divider(),
+              ListTile(
+                leading: Icon(Icons.account_circle_outlined),
+                title: Text('Profile'),
+                onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -65,15 +74,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                         teacherDepartment: widget.teacherDepartment,
                       ),
                     ),
-                  );
-                },
-              ),
-              Divider(),
-              ListTile(
-                leading: Icon(Icons.account_circle_outlined),
-                title: Text('Profile'),
-                onTap: () {
-                  Navigator.pop(context); // Close the drawer
+                  ); // Close the drawer
                   // Navigate to the settings screen
                 },
               ),
@@ -130,12 +131,12 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
             ),
             Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 100,
                 ),
                 Container(
-                  margin: EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20)
