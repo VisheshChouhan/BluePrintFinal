@@ -54,7 +54,7 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
         actions: [
           IconButton(
             onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> const ProfilePage(),),);
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> const ProfilePage(teacherName: '', teacherEmail: '', teacherPhone: '', teacherDepartment: '',),),);
             },
             icon: const Icon(
               Icons.account_circle_rounded,

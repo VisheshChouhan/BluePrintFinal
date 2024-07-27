@@ -63,20 +63,31 @@ class _SplashScreenState extends State<SplashScreen> {
                 MaterialPageRoute(
                     builder: (context) => CoordinatorHomePage(
                         coordinatorUID: data["uniqueId"],
-                        coordinatorName: data["name"])),
+                        coordinatorName: data["name"],
+                        coordinatorEmail: data["email"],
+                        coordinatorPhone: data["phone"],
+                        coordinatorDepartment: data["department"],
+                    )),
               );
             } else if ("teacher" == data["role"].toString()) {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                     builder: (context) => TeacherHomePage(
                         teacherCode: data["uniqueId"],
-                        teacherName: data["name"])),
+                        teacherName: data["name"],
+                        teacherEmail: data["email"],
+                        teacherPhone: data["phone"],
+                        teacherDepartment: data["department"])),
               );
             } else {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => StudentHomePage(
                       studentUID: data["studentCode"],
-                      studentName: data["studentName"])));
+                      studentName: data["studentName"],
+                      studentEmail: data["email"],
+                      studentPhone: data["phone"],
+                      studentDepartment: data["department"],)));
+
             }
           },
           onError: (e) => print("Error getting document: $e"),

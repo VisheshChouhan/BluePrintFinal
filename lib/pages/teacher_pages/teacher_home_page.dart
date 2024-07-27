@@ -5,13 +5,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../features/roles/teacher/presentation/pages/profile_page.dart';
 import '../splash_screen.dart';
 
 class TeacherHomePage extends StatefulWidget {
   final String teacherCode;
   final String teacherName;
+  final String teacherEmail;
+  final String teacherPhone;
+  final String teacherDepartment;
   const TeacherHomePage(
-      {super.key, required this.teacherCode, required this.teacherName});
+      {super.key,
+        required this.teacherCode,
+        required this.teacherName,
+        required this.teacherEmail,
+        required this.teacherPhone,
+        required this.teacherDepartment});
 
   @override
   State<TeacherHomePage> createState() => _TeacherHomePageState();
@@ -46,8 +55,17 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
                 leading: Icon(Icons.home),
                 title: Text('Home'),
                 onTap: () {
-                  Navigator.pop(context); // Close the drawer
-                  // Navigate to the home screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                        teacherName: widget.teacherName,
+                        teacherEmail: widget.teacherEmail,
+                        teacherPhone: widget.teacherPhone,
+                        teacherDepartment: widget.teacherDepartment,
+                      ),
+                    ),
+                  );
                 },
               ),
               Divider(),
