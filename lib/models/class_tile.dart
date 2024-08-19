@@ -10,7 +10,8 @@ class ClassTile extends StatelessWidget {
 
   //final lectureType;
 
-  const ClassTile({
+  const
+  ClassTile({
     super.key,
     required this.courseCode,
     required this.courseName,

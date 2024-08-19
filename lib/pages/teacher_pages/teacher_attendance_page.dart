@@ -47,6 +47,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
   bool isExpanded = false;
   bool sendingData = false;
 
+  // For progress bar when setting up class
+  bool isSettingClass = false;
+
   FirebaseFirestore db = FirebaseFirestore.instance;
 
   @override
@@ -309,6 +312,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
   Future<List> setupClass(String tempClassCode) async {
     List<dynamic> commandList = [];
     final tempStudentData = [];
+    setState(() {
+      isSettingClass = true;
+    });
     int templateId = 0;
     {
       print("Inside Setup Class else");
@@ -378,6 +384,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
       //   print("cities in CA: ${cities.join(", ")}");
       // });
     }
+    setState(() {
+      isSettingClass = false;
+    });
 
     return commandList;
   }
@@ -463,6 +472,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
         body: SingleChildScrollView(
       child: Stack(
         children: [
+          Center(
+            child: isSettingClass ? CircularProgressIndicator(): null,
+          ),
           Column(
             children: [
               Container(

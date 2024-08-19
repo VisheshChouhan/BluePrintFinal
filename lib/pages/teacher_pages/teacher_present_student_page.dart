@@ -2,11 +2,17 @@ import 'package:blue_print/assets/my_color_theme.dart';
 import 'package:blue_print/models/my_textfield.dart';
 import 'package:blue_print/pages/teacher_pages/custom_checkbox_tile.dart';
 import 'package:blue_print/pages/teacher_pages/custom_map.dart';
+import 'package:blue_print/sql_classes/attendance_detail_for_class.dart';
+import 'package:blue_print/sql_classes/attendance_detail_for_students.dart';
+import 'package:blue_print/sql_classes/sql_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
+import '../../helper_classes/internet_connectivity_service.dart';
 
 class TeacherPresentStudentPage extends StatefulWidget {
   final Set<dynamic> initialPresentStudents;
@@ -30,12 +36,34 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
   int totalStudents = 0;
   FirebaseFirestore db = FirebaseFirestore.instance;
   TextEditingController attendanceCode = new TextEditingController();
+  late SQLiteDataBase handler;
+
+  // For checking internet Connectivity
+  final ConnectivityService _connectivityService = ConnectivityService();
+  late Stream<ConnectivityResult> _connectivityStream;
+  bool _isConnected = true;
+
+  bool _isStoringAttendance = false;
 
   @override
   void initState() {
     // TODO: implement initState
-    selectedStudentCodes = widget.initialPresentStudents;
+
     super.initState();
+
+    //Sqlite Database helper
+    handler = SQLiteDataBase();
+
+    selectedStudentCodes = widget.initialPresentStudents;
+
+    // For checking internet connectivity
+    _connectivityStream = _connectivityService.connectivityStream;
+    _checkConnection();
+  }
+
+  Future<void> _checkConnection() async {
+    _isConnected = await _connectivityService.isConnected();
+    setState(() {});
   }
 
   void onCheckboxChanged(
@@ -85,7 +113,12 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
+      body: Stack(
+        children: [
+          Center(
+            child: _isStoringAttendance ? CircularProgressIndicator(): null,
+          ),
+       SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,9 +249,21 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
                         shape: RoundedRectangleBorder(),
                         foregroundColor: Colors.white,
                         backgroundColor: MyColorThemeTheme.blueColor),
-                    onPressed: () {
+                    onPressed: _isStoringAttendance ?null: () async {
                       if (attendanceCode.text.isNotEmpty) {
-                        storeAttendance();
+                        await storeInSql();
+                        await _checkConnection();
+                        if (_isConnected) {
+                          print('_isConnected');
+                          print(_isConnected);
+                          await sendFromSQLiteToFirebase();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              new SnackBar(
+                                  content: Text("You are Offline.. \n The data will be stored in local Database.  ")));
+                        }
+
+                        // storeAttendance();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -229,18 +274,111 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
                     child: const Text("Store Attendance")))
           ],
         ),
-      ),
+      ),]),
     );
   }
 
-  Future<void> checkDateExistAndIncrement(String formattedDate) async {
+  Future<void> storeInSql() async {
+    // SQLiteDataBase handler = SQLiteDataBase();
+    // To refresh the content of finallyPresentStudentMap so that its current length got used
+    setState(() {
+      finallyPresentStudentMap;
+      _isStoringAttendance = true;
+    });
+    // length of above map
+    String finalPresentStudentMapLength =
+        finallyPresentStudentMap.length.toString();
+
+    // Today's date
+    DateTime now = DateTime.now();
+    String formattedDate =
+        "${DateFormat('dd-MM-yyyy').format(now)}-${attendanceCode.text.toString().trim()}";
+
+    // First we will store the class Data
+    AttendanceDetailForClass attendanceDetailForClass =
+        AttendanceDetailForClass(widget.classCode, formattedDate,
+            finalPresentStudentMapLength, totalStudents.toString());
+    List<AttendanceDetailForClass> listOfAttendanceDetailForClass = [
+      attendanceDetailForClass
+    ];
+    await handler.insertInClassTable(listOfAttendanceDetailForClass);
+
+    // Inserting into Student Table in Sqlite
+    List<AttendanceDetailForStudents> listOfAttendanceDetailForStudents = [];
+
+    for (int i = 0; i < finallyPresentStudentMap.length; i++) {
+      String tempStudentCode =
+          finallyPresentStudentMap.elementAt(i)["studentCode"];
+      String tempStudentName =
+          finallyPresentStudentMap.elementAt(i)["studentName"];
+
+      AttendanceDetailForStudents attendanceDetailForStudents =
+          AttendanceDetailForStudents(tempStudentCode, tempStudentName,
+              widget.classCode, formattedDate);
+
+      listOfAttendanceDetailForStudents.add(attendanceDetailForStudents);
+    }
+
+    await handler.insertInStudentTable(listOfAttendanceDetailForStudents);
+
+    setState(() {
+
+      _isStoringAttendance = false;
+    });
+
+
+  }
+
+  Future<void> sendFromSQLiteToFirebase() async {
+    // SQLiteDataBase handler = SQLiteDataBase();
+    // To refresh the content of finallyPresentStudentMap so that its current length got used
+    setState(() {
+      finallyPresentStudentMap;
+      _isStoringAttendance = true;
+    });
+
+
+
+
+
+    // For class Table
+    List<AttendanceDetailForClass> listOfAttendanceDetailForClass =
+        await handler.retrieveClassTable();
+    for (var attendanceDetailForClass in listOfAttendanceDetailForClass) {
+      await checkDateExistAndIncrementAndAddNumberOfPresentStudents(
+          attendanceDetailForClass);
+    }
+
+    // For Student Table
+    List<AttendanceDetailForStudents> listOfAttendanceDetailForStudents =
+        await handler.retrieveStudentTable();
+    for (var attendanceDetailForStudents in listOfAttendanceDetailForStudents) {
+      await checkStudentExistAndUpdateAtEachPlace(attendanceDetailForStudents);
+    }
+
+    setState(() {
+
+      _isStoringAttendance = false;
+    });
+  }
+
+  Future<void> checkDateExistAndIncrementAndAddNumberOfPresentStudents(
+      AttendanceDetailForClass attendanceDetailForClass) async {
+    String classTableClassCode = attendanceDetailForClass.classCode;
+    String classTableFormattedDate = attendanceDetailForClass.formattedDate;
+    String classTableFinalPresentStudentMapLength =
+        attendanceDetailForClass.finalPresentStudentMapLength;
+    String classTableTotalStudents = attendanceDetailForClass.totalStudents;
+    int? classTableid = attendanceDetailForClass.id;
+
     try {
       // Fetch the document from Firestore
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('classes')
-          .doc(widget.classCode) // Replace with your document ID
+          .doc(
+              classTableClassCode) // .doc(widget.classCode) // Replace with your document ID
           .collection("attendance")
-          .doc(formattedDate)
+          .doc(classTableFormattedDate) // .doc(formattedDate)
           .get();
 
       if (doc.exists) {
@@ -251,10 +389,19 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
         print('Document does not exist. Performing operation...');
         // Example operation: Add a new document
         // This increment the number of total classes by one
-        DocumentReference docRef =
-            db.collection('classes').doc(widget.classCode);
+        DocumentReference classRef = db
+            .collection('classes')
+            .doc(classTableClassCode); //.doc(widget.classCode);
+
+        DocumentReference classAttendanceDateReg =
+            db // will refer to attendance of particular date
+                .collection("classes")
+                .doc(classTableClassCode) // .doc(widget.classCode)
+                .collection("attendance")
+                .doc(classTableFormattedDate); //.doc(formattedDate);
+
         db.runTransaction((transaction) async {
-          DocumentSnapshot snapshot = await transaction.get(docRef);
+          DocumentSnapshot snapshot = await transaction.get(classRef);
 
           if (!snapshot.exists) {
             throw Exception("Document does not exist!");
@@ -262,130 +409,194 @@ class _TeacherPresentStudentPageState extends State<TeacherPresentStudentPage> {
 
           int currentValue = snapshot["totalNumberOfClasses"];
           int newValue = currentValue + 1;
-          transaction.update(docRef, {'totalNumberOfClasses': newValue});
-        }).then((_) {
+          transaction.update(classRef, {'totalNumberOfClasses': newValue});
+
+          transaction.set(classAttendanceDateReg, {
+            "date": classTableFormattedDate, //"date": formattedDate,
+            "totalPresentStudents":
+                classTableFinalPresentStudentMapLength, //finallyPresentStudentMap.length.toString(),
+            "totalStudents": classTableTotalStudents //totalStudents
+          });
+        }).then((_) async {
+          // Now we will delete entry from sql table cause now its in firebase
+          await handler.deleteClassRow(classTableid!);
+
           print("Transaction successfully committed!");
         }).catchError((error) {
           print("Transaction failed: $error");
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-            new SnackBar(content: Text("Data Successfully stored")));
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //     new SnackBar(content: Text("Data Successfully stored")));
       }
+      // Its is added above in transaction
+      // Added here so that only have to maintain one function
+      // Adding number of present Students
+      // db
+      //     .collection("classes")
+      //     .doc(widget.classCode)
+      //     .collection("attendance")
+      //     .doc(formattedDate)
+      //     .set({
+      //   "date": formattedDate,
+      //   "totalPresentStudents": finallyPresentStudentMap.length.toString(),
+      //   "totalStudents": totalStudents
+      // });
     } catch (e) {
       print('Error fetching document: $e');
     }
   }
 
+  Future<void> checkStudentExistAndUpdateAtEachPlace(
+      AttendanceDetailForStudents attendanceDetailForStudents) async {
+    int? studentTableId = attendanceDetailForStudents.id;
+    String studentTableStudentCode = attendanceDetailForStudents.studentCode;
+    String studentTableStudentName = attendanceDetailForStudents.studentName;
+    String studentTableClassCode = attendanceDetailForStudents.classCode;
+    String studentTableFormattedDate =
+        attendanceDetailForStudents.formattedDate;
 
-  Future<void> checkStudentExistAndIncrement(String studentUID) async {
     try {
+      // Document does not exist, perform the operation
+      print('Document does not exist. Performing operation...');
+      // Example operation: Add a new document
+      // This increment the number of total classes by one
+      DocumentReference classStudentAttendance = db
+          .collection('classes')
+          .doc(studentTableClassCode) // .doc(widget.classCode)
+          .collection("students")
+          .doc(studentTableStudentCode); // .doc(studentUID);
 
-        // Document does not exist, perform the operation
-        print('Document does not exist. Performing operation...');
-        // Example operation: Add a new document
-        // This increment the number of total classes by one
-        DocumentReference docRef =
-        db.collection('classes').doc(widget.classCode).collection("students").doc(studentUID);
-        db.runTransaction((transaction) async {
-          DocumentSnapshot snapshot = await transaction.get(docRef);
+      DocumentReference particularDateAttendance = db
+          .collection("classes")
+          .doc(studentTableClassCode) // .doc(widget.classCode)
+          .collection("attendance")
+          .doc(studentTableFormattedDate) // .doc(formattedDate)
+          .collection("presentStudents")
+          .doc(studentTableStudentCode); //.doc(tempStudentCode);
 
-          if (!snapshot.exists) {
-            throw Exception("Document does not exist!");
-          }
+      DocumentReference studentClassAttendance = db
+          .collection("students")
+          .doc(studentTableStudentCode) // .doc(tempStudentCode)
+          .collection("classes")
+          .doc(studentTableClassCode) // .doc(widget.classCode)
+          .collection("attendance")
+          .doc(studentTableFormattedDate); // .doc(formattedDate);
 
-          int currentValue = snapshot["totalDaysPresent"];
-          int newValue = currentValue + 1;
-          transaction.update(docRef, {'totalDaysPresent': newValue});
-        }).then((_) {
-          print("Transaction successfully committed!");
-        }).catchError((error) {
-          print("Transaction failed: $error");
-        });
+      Map<String, dynamic> tempStudentMap = {
+        "studentCode": studentTableStudentCode,
+        "studentName": studentTableStudentName
+      };
 
-        ScaffoldMessenger.of(context).showSnackBar(
-            new SnackBar(content: Text("Data Successfully stored")));
+      db.runTransaction((transaction) async {
+        DocumentSnapshot snapshot =
+            await transaction.get(classStudentAttendance);
 
+        if (!snapshot.exists) {
+          throw Exception("Document does not exist!");
+        }
+
+        // for classStudentAttendance Entry
+        int currentValue = snapshot["totalDaysPresent"];
+        int newValue = currentValue + 1;
+        transaction
+            .update(classStudentAttendance, {'totalDaysPresent': newValue});
+
+        // For particularDateAttendance Entry
+        transaction.set(particularDateAttendance, tempStudentMap);
+
+        // For student Class Attendance
+        transaction
+            .set(studentClassAttendance, {"date": studentTableFormattedDate});
+      }).then((_) async {
+        await handler.deleteStudentRow(studentTableId!);
+        print("Transaction successfully committed!");
+      }).catchError((error) {
+        print("Transaction failed: $error");
+      });
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //     new SnackBar(content: Text("Data Successfully stored")));
     } catch (e) {
       print('Error fetching document: $e');
     }
   }
 
-
-
-  Future<void> storeAttendance() async {
-    setState(() {
-      finallyPresentStudentMap;
-    });
-    // Get the current date
-    DateTime now = DateTime.now();
-    // Format the date
-    String formattedDate = "${DateFormat('dd-MM-yyyy').format(now)}-${attendanceCode.text.toString().trim()}";
-
-    //This function increases the number of classes
-    await checkDateExistAndIncrement(formattedDate);
-
-    // Adding number of present Students
-    db
-        .collection("classes")
-        .doc(widget.classCode)
-        .collection("attendance")
-        .doc(formattedDate)
-        .set({
-      "date": formattedDate,
-      "totalPresentStudents": finallyPresentStudentMap.length.toString(),
-      "totalStudents": totalStudents
-    });
-
-    print("finallyPresentStudentMap");
-    print(finallyPresentStudentMap.toString());
-    for (int i = 0; i < finallyPresentStudentMap.length; i++) {
-        String tempStudentCode =
-            finallyPresentStudentMap.elementAt(i)["studentCode"];
-        String tempStudentName =
-            finallyPresentStudentMap.elementAt(i)["studentName"];
-
-        await checkStudentExistAndIncrement(tempStudentCode);
-        db
-            .collection("classes")
-            .doc(widget.classCode)
-            .collection("attendance")
-            .doc(formattedDate)
-            .collection("presentStudents")
-            .doc(tempStudentCode)
-            .set(finallyPresentStudentMap.elementAt(i).getInnerMap());
-
-        db
-            .collection("students")
-            .doc(tempStudentCode)
-            .collection("classes")
-            .doc(widget.classCode)
-            .collection("attendance")
-            .doc(formattedDate)
-            .set({"date": formattedDate});
-    }
-
-
-
-    // // This increment the number of total classes by one
-    // DocumentReference docRef = db.collection('classes').doc(widget.classCode);
-    // db.runTransaction((transaction) async {
-    //   DocumentSnapshot snapshot = await transaction.get(docRef);
-    //
-    //   if (!snapshot.exists) {
-    //     throw Exception("Document does not exist!");
-    //   }
-    //
-    //   int currentValue = snapshot["totalNumberOfClasses"];
-    //   int newValue = currentValue + 1;
-    //   transaction.update(docRef, {'totalNumberOfClasses': newValue});
-    // }).then((_) {
-    //   print("Transaction successfully committed!");
-    // }).catchError((error) {
-    //   print("Transaction failed: $error");
-    // });
-    //
-    // ScaffoldMessenger.of(context)
-    //     .showSnackBar(new SnackBar(content: Text("Data Successfully stored")));
-  }
+  // Future<void> storeAttendance() async {
+  //   setState(() {
+  //     finallyPresentStudentMap;
+  //   });
+  //   // Get the current date
+  //   DateTime now = DateTime.now();
+  //   // Format the date
+  //   String formattedDate =
+  //       "${DateFormat('dd-MM-yyyy').format(now)}-${attendanceCode.text.toString().trim()}";
+  //
+  //   //This function increases the number of classes
+  //   await checkDateExistAndIncrementAndAddNumberOfPresentStudents(
+  //       formattedDate);
+  //   //        ^^^^^^^ /\
+  //   //        ||||||| ||
+  //   //  Added in above function
+  //   // Adding number of present Students
+  //   // db
+  //   //     .collection("classes")
+  //   //     .doc(widget.classCode)
+  //   //     .collection("attendance")
+  //   //     .doc(formattedDate)
+  //   //     .set({
+  //   //   "date": formattedDate,
+  //   //   "totalPresentStudents": finallyPresentStudentMap.length.toString(),
+  //   //   "totalStudents": totalStudents
+  //   // });
+  //
+  //   print("finallyPresentStudentMap");
+  //   print(finallyPresentStudentMap.toString());
+  //   for (int i = 0; i < finallyPresentStudentMap.length; i++) {
+  //     String tempStudentCode =
+  //         finallyPresentStudentMap.elementAt(i)["studentCode"];
+  //     String tempStudentName =
+  //         finallyPresentStudentMap.elementAt(i)["studentName"];
+  //
+  //     await checkStudentExistAndIncrement(tempStudentCode);
+  //     db
+  //         .collection("classes")
+  //         .doc(widget.classCode)
+  //         .collection("attendance")
+  //         .doc(formattedDate)
+  //         .collection("presentStudents")
+  //         .doc(tempStudentCode)
+  //         .set(finallyPresentStudentMap.elementAt(i).getInnerMap());
+  //
+  //     db
+  //         .collection("students")
+  //         .doc(tempStudentCode)
+  //         .collection("classes")
+  //         .doc(widget.classCode)
+  //         .collection("attendance")
+  //         .doc(formattedDate)
+  //         .set({"date": formattedDate});
+  //   }
+  //
+  //   // // This increment the number of total classes by one
+  //   // DocumentReference docRef = db.collection('classes').doc(widget.classCode);
+  //   // db.runTransaction((transaction) async {
+  //   //   DocumentSnapshot snapshot = await transaction.get(docRef);
+  //   //
+  //   //   if (!snapshot.exists) {
+  //   //     throw Exception("Document does not exist!");
+  //   //   }
+  //   //
+  //   //   int currentValue = snapshot["totalNumberOfClasses"];
+  //   //   int newValue = currentValue + 1;
+  //   //   transaction.update(docRef, {'totalNumberOfClasses': newValue});
+  //   // }).then((_) {
+  //   //   print("Transaction successfully committed!");
+  //   // }).catchError((error) {
+  //   //   print("Transaction failed: $error");
+  //   // });
+  //   //
+  //   // ScaffoldMessenger.of(context)
+  //   //     .showSnackBar(new SnackBar(content: Text("Data Successfully stored")));
+  // }
 }

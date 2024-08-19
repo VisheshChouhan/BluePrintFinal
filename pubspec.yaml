@@ -50,10 +50,12 @@ dependencies:
   path: ^1.8.3
   csv: ^5.0.1
   flutter_blue_plus: ^1.0.0
+  sqflite: ^2.3.3+1
 
 
   flutter_bluetooth_serial: ^0.4.0
   bluetooth_enable_fork: ^0.1.6
+  connectivity_plus: ^3.0.3
 
 
 dev_dependencies:
