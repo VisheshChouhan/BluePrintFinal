@@ -194,11 +194,14 @@ class _AdminHomePageOldState extends State<AdminHomePageOld>
 
       if (data.startsWith("te")) {
         if (templateData.length == 1024) {
+          String tempStudentName = userSerialController.text.toUpperCase().replaceAll(' ', '');
           db
               .collection('students')
-              .doc(userSerialController.text.toUpperCase().replaceAll(' ', ''))
+              .doc(tempStudentName)
               .set({
             'template': templateData,
+            "studentCode": tempStudentName,
+            "studentName" : tempStudentName
           });
           espOutputController.text = "";
         } else {

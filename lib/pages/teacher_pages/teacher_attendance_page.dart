@@ -316,7 +316,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
       isSettingClass = true;
     });
     int templateId = 0;
-    {
+
       print("Inside Setup Class else");
       // String tempStudentCode = "FINGER1";
       // String tempStudentTemplate =
@@ -371,6 +371,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
 
       print("Before sending command");
 
+      print("command List");
+      print(commandList.toString());
+
       //To read Students data
       // await db
       //     .collection("students")
@@ -383,7 +386,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
       //   }
       //   print("cities in CA: ${cities.join(", ")}");
       // });
-    }
+
     setState(() {
       isSettingClass = false;
     });
