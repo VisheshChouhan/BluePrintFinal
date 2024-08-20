@@ -395,6 +395,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
   }
 
   Future<void> sendBulkCommand(List<dynamic> commandList) async {
+    setState(() {
+      isSettingClass = true;
+    });
     print("inside send bulk command");
     print(commandList);
     for (String command in commandList) {
@@ -403,6 +406,9 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
       await _connection?.output.allSent;
       sleep(Duration(seconds: 3));
     }
+    setState(() {
+      isSettingClass = false;
+    });
   }
 
   void _navigateToNextScreen(Set<dynamic> usernames) {
@@ -577,7 +583,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                             8), // Optional: slightly rounded
                       ), // Background color of the button
                     ),
-                    onPressed: _isConnected && !sendingData
+                    onPressed: _isConnected && !sendingData && !isSettingClass
                         ? () async {
                             _connection?.output
                                 .add(Uint8List.fromList(utf8.encode("c")));
@@ -600,7 +606,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                             8), // Optional: slightly rounded
                       ), // Background color of the button
                     ),
-                    onPressed: _isConnected && !sendingData
+                    onPressed: _isConnected && !sendingData && !isSettingClass
                         ? () async {
                             _connection?.output
                                 .add(Uint8List.fromList(utf8.encode("s")));
@@ -623,7 +629,7 @@ class _TeacherAttendancePageState extends State<TeacherAttendancePage> {
                             8), // Optional: slightly rounded
                       ), // Background color of the button
                     ),
-                    onPressed: _isConnected && !sendingData
+                    onPressed: _isConnected && !sendingData && !isSettingClass
                         ? () {
                             _connection?.output
                                 .add(Uint8List.fromList(utf8.encode("r")));
